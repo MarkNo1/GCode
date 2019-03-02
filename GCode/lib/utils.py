@@ -1,4 +1,4 @@
- # Designed for python 3.7
+# Designed for python 3.7
 
 # Copyright 2019 Marco Treglia
 #
@@ -46,7 +46,52 @@
 
 
 
- ## DEFINE PRIMITIVE
+## DEFINE PRIMITIVE
+
+## FILES & FOLDERS
+import os
+
+# Read File
+read = lambda file: open(file, 'r').read()
+
+# Read File
+write = lambda file, text: open(file, 'w').write(text)
+
+# Read File
+append = lambda file, text: open(file, 'a').write(text)
+
+# Check Existance File
+exists = lambda file : os.path.exists(file)
+
+# Create File
+mkfile = lambda file : write(file, '') if not exists(file) else None
+
+# Create Folder
+mkdir = lambda folder : os.mkdir(folder) if not exists(folder) else None
+
+# Joint Path
+path = lambda parent, child : os.path.join(parent, child)
+
+
+
+## TIME
+from time import gmtime, strftime
+
+# Now
+now = lambda : gmtime()
+
+# Time Now Formatted
+time = lambda : strftime('%Y.%m.%d.%H:%M', now())
+
+
+## Dictionary Extension
+class Dictionary(dict):
+    def __init__(self, *args, **kwargs):
+        super(Dictionary, self).__init__(*args, **kwargs)
+        self.__dict__ = self
+
+    __version__ = 0.1
+
 
 ## COLORS
 
@@ -54,8 +99,7 @@
 STYLES_ = [ dict(a=a,b=b,c=c)
             for a in range(8)
             for b in range(38)
-            for c in range(48)
-            ]
+            for c in range(48)]
 
 
 # Create Color Code
@@ -79,33 +123,33 @@ ShowAllStyles = lambda : print('STYLES TABLES\n\n' + ''.join([StyledTextInternal
 
 
 ### DEFINE your commons styles:
+
 Success = lambda text: UseStyle(13088, text)
 Fail = lambda text: UseStyle(13087, text)
 Warning = lambda text: UseStyle(13137, text)
 Header = lambda text: UseStyle(1679, text)
 
 
-#### Unicode Emoji
 
-# Faces
-FACE = {
-        'happy':u'\U0001F603'.encode('utf-8'),
-        'ops  ':u'\U0001F605'.encode('utf-8'),
-        'ish  ':u'\U0001F601'.encode('utf-8'),
-        'done ':u'\U0001F60C'.encode('utf-8'),
-        'sad  ':u'\U0001F614'.encode('utf-8'),
-        'angry':u'\U0001F621'.encode('utf-8')}
+#### UNICODE EMOJI
 
-# Markers
-MARKER = {
-        'success':u'\U00002705'.encode('utf-8'),
-        'fail    ':u'\U0000274C'.encode('utf-8'),
-        'question ':u'\U00002753'.encode('utf-8'),
-        'esclamation':u'\U00002757'.encode('utf-8')}
+# Faces emoticons
+faces = Dictionary()
+faces = Dictionary(
+        happy=u'\U0001F603'.encode('utf-8'),
+        ops  =u'\U0001F605'.encode('utf-8'),
+        ish  =u'\U0001F601'.encode('utf-8'),
+        done =u'\U0001F60C'.encode('utf-8'),
+        sad  =u'\U0001F614'.encode('utf-8'),
+        angry=u'\U0001F621'.encode('utf-8'))
+
+# Markers emoticons
+marker = Dictionary(
+        success=u'\U00002705'.encode('utf-8'),
+        fail    =u'\U0000274C'.encode('utf-8'),
+        question =u'\U00002753'.encode('utf-8'),
+        esclamation=u'\U00002757'.encode('utf-8'))
 
 
-# Add Face specifying the type
-Face = lambda type : FACE[type].decode('utf-8')
-
-# Add Marker specifying the type
-Marker = lambda type : MARKER[type].decode('utf-8')
+# Add face emoticon
+Emoji = lambda unicode : unicode.decode('utf-8')
