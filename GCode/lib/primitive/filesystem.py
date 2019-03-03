@@ -29,21 +29,36 @@ import os
 
 # Read File
 read = lambda file: open(file, 'r').read()
+r=read
 
-# Read File
+# Write File
 write = lambda file, text: open(file, 'w').write(text)
+w=write
 
-# Read File
+# Append File
 append = lambda file, text: open(file, 'a').write(text)
+a=append
 
 # Check Existance File
 exists = lambda file : os.path.exists(file)
+e=exists
 
 # Create File
 mkfile = lambda file : write(file, '') if not exists(file) else None
+mf=mkfile
 
 # Create Folder
 mkdir = lambda folder : os.mkdir(folder) if not exists(folder) else None
+md=mkdir
 
 # Joint Path
 path = lambda parent, child : os.path.join(parent, child)
+p=path
+
+# List folder
+list_folder = lambda path : os.listdir(path)
+lsd=list_folder
+
+# File Descriptor
+file_descriptor = lambda file : open(file, 'r')
+fd=file_descriptor

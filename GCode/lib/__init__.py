@@ -1,2 +1,2 @@
-from primitive import *
-from generators import Xml
+from .primitive import *
+from .generators import *
