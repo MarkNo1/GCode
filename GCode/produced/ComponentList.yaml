@@ -18,13 +18,13 @@ Components:
       topics:
           -
             type: publisher
-            name: /position_x
+            name: position_x
             msg : std_msgs::Float32
           -
             type: publisher
-            name: /position_y
+            name: position_y
             msg : std_msgs::Float32
 
             type: subscriber
-            name: /velocity
+            name: velocity
             msg : std_msgs::Float32
