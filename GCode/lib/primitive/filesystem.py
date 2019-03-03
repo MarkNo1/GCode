@@ -24,54 +24,26 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#!/usr/local/bin/python3.7
-# -*- coding: utf-8 -*-
+## FILES & FOLDERS
+import os
 
-"""
-PyVision for the sexylib PyQt6
-last edited: March 2019
-"""
+# Read File
+read = lambda file: open(file, 'r').read()
 
-import sys, traceback
-from PyQt5.QtWidgets import QApplication, QWidget
-from utils import Dictionary
-from utils import read, write
-from utils import UseStyle, Emoji , faces, marker
+# Read File
+write = lambda file, text: open(file, 'w').write(text)
 
-# Default Windows features
-DefaultWindowsGeometry = Dictionary(x=300,y=300, h=360, w=420)
-styles = Dictionary(start=3461,end=3317)
+# Read File
+append = lambda file, text: open(file, 'a').write(text)
 
-Log = Dictionary(start=UseStyle(styles.start,'Application v0.1 Started') + Emoji(faces.happy),
-                end=UseStyle(styles.end,'Application v0.1 Closed') + Emoji(marker.success))
+# Check Existance File
+exists = lambda file : os.path.exists(file)
 
+# Create File
+mkfile = lambda file : write(file, '') if not exists(file) else None
 
-# QT QApplication
-class Application():
-    def __init__(self, *args, **kwargs):
-        print(Log.start)
-        self.APP = QApplication(*args,**kwargs)
+# Create Folder
+mkdir = lambda folder : os.mkdir(folder) if not exists(folder) else None
 
-    # Destructor
-    def __del__(self):
-        try:
-            sys.exit(self.APP.exec_())
-        except BaseException:
-            print(Log.end)
-
-
-# QT Widgets Window
-def Window(geometry=DefaultWindowsGeometry):
-    w = QWidget()
-    w.resize(geometry.h, geometry.w)
-    w.move(geometry.x, geometry.y)
-    w.setWindowTitle('Simple')
-    return w
-
-
-
-if __name__ == '__main__':
-    from time import sleep
-    app = Application(sys.argv)
-    w = Window()
-    w.show()
+# Joint Path
+path = lambda parent, child : os.path.join(parent, child)

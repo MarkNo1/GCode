@@ -1,0 +1,11 @@
+<library
+        path="lib/libhexagrid_nodelet">
+    <class
+            name="perception/HexagonsGrid"
+            type="renault_nodelets::HexagonsGrid"
+            base_class_type="nodelet::Nodelet">
+        <description>
+            HexagonsGrid Nodelet implementation.
+        </description>
+    </class>
+</library>

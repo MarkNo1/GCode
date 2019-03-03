@@ -23,74 +23,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# .--..--..--..--..--..--..--..--..--..--..--..--..--..--..--..--.
-#/ .. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \.. \
-#\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/ /
-# \/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /
-# / /\/ /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /`' /\/ /\
-#/ /\ \/`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'\ \/\ \
-#\ \/\ \                                                    /\ \/ /
-# \/ /\ \                                                  / /\/ /
-# / /\/ /                      UTILS                       \ \/ /\
-#/ /\ \/                                                    \ \/\ \
-#\ \/\ \                  looks likes  ...                  /\ \/ /
-# \/ /\ \                                                  / /\/ /
-# / /\/ /                                                  \ \/ /\
-#/ /\ \/                                                    \ \/\ \
-#\ \/\ \.--..--..--..--..--..--..--..--..--..--..--..--..--./\ \/ /
-# \/ /\/ ../ ../ ../ ../ ../ ../ ../ ../ ../ ../ ../ ../ ../ /\/ /
-# / /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\/ /\
-#/ /\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \/\ \
-#\ `'\ `'\ `'\ `'\ `'\ `'\ `'\ `'\ `'\ `'\ `'\ `'\ `'\ `'\ `'\ `' /
-# `--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'`--'
-
-
-
-## DEFINE PRIMITIVE
-
-## FILES & FOLDERS
-import os
-
-# Read File
-read = lambda file: open(file, 'r').read()
-
-# Read File
-write = lambda file, text: open(file, 'w').write(text)
-
-# Read File
-append = lambda file, text: open(file, 'a').write(text)
-
-# Check Existance File
-exists = lambda file : os.path.exists(file)
-
-# Create File
-mkfile = lambda file : write(file, '') if not exists(file) else None
-
-# Create Folder
-mkdir = lambda folder : os.mkdir(folder) if not exists(folder) else None
-
-# Joint Path
-path = lambda parent, child : os.path.join(parent, child)
-
-
-
-## TIME
-from time import gmtime, strftime
-
-# Now
-now = lambda : gmtime()
-
-# Time Now Formatted
-time = lambda : strftime('%Y.%m.%d.%H:%M', now())
-
-
-## Dictionary Extension
-class Dictionary(dict):
-    def __init__(self, *args, **kwargs):
-        super(Dictionary, self).__init__(*args, **kwargs)
-        self.__dict__ = self
-
-    __version__ = 0.1
 
 
 ## COLORS
@@ -134,7 +66,6 @@ Header = lambda text: UseStyle(1679, text)
 #### UNICODE EMOJI
 
 # Faces emoticons
-faces = Dictionary()
 faces = Dictionary(
         happy=u'\U0001F603'.encode('utf-8'),
         ops  =u'\U0001F605'.encode('utf-8'),
