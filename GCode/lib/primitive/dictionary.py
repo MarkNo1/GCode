@@ -44,3 +44,6 @@ class Dictionary(dict):
 
 
     __version__ = 0.3
+
+# Fresh
+Dict = Dictionary

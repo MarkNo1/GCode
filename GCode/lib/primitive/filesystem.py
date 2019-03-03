@@ -39,9 +39,17 @@ w=write
 append = lambda file, text: open(file, 'a').write(text)
 a=append
 
-# Check Existance File
+# Check Existance
 exists = lambda file : os.path.exists(file)
 e=exists
+
+# Is File
+isFile = lambda x : os.path.isfile(x)
+isf=isFile
+
+# Is Dir
+isDir = lambda x : os.path.isdir(x)
+isd=isDir
 
 # Create File
 mkfile = lambda file : write(file, '') if not exists(file) else None
@@ -62,3 +70,20 @@ lsd=list_folder
 # File Descriptor
 file_descriptor = lambda file : open(file, 'r')
 fd=file_descriptor
+
+# Current path
+pwd = lambda : os.getcwd()
+
+# Basename
+basename = lambda path : os.path.basename(path)
+
+# File extension
+exts = lambda file : file.split('.')[1]
+
+# Walker
+# List of all files in directory tree at given path
+def walker(path):
+    all = list()
+    for (dirpath, dirnames, filenames) in os.walk(path):
+        all += [os.path.join(dirpath, file) for file in filenames]
+    return all

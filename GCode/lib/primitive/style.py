@@ -84,3 +84,10 @@ marker = Dictionary(
 
 # Add face emoticon
 Emoji = lambda unicode : unicode.decode('utf-8')
+
+
+# Logging
+
+FAIL = lambda : Emoji(marker.fail)
+SUCCESS = lambda : Emoji(marker.success)
+LOG = lambda result : SUCCESS() if result else FAIL()
