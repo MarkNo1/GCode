@@ -24,7 +24,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from lib.primitive import Dictionary
+from gcode.primitive import Dictionary
 
 # XML Helper
 indent = lambda n : n * '\t'

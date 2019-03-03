@@ -25,9 +25,10 @@
 
 import yaml
 
-from lib.primitive import walker, pwd, exts, basename
-from lib.primitive import Dictionary
-from lib.primitive import LOG
+from gcode.primitive import walker, pwd, exts, basename
+from gcode.primitive import Dictionary
+from gcode.primitive import LOG
+import gcode.primitive as gp
 
 
 TARGET = 'ComponentList'
@@ -44,8 +45,10 @@ class Agent:
         self.details['path'] = path
         self.result=False
 
-    def Log(self):
-        print(f'{self.details.name}: {LOG(self.result)} ')
+    def Log(self, emojy=None):
+        result = Emoji(emojy) if emojy else LOG(self.result)
+        print(f'{self.details.name}: {result} ')
+
 
 
 # Agent ( Searcher )
@@ -53,7 +56,9 @@ class Searcher(Agent):
     def __init__(self,path=pwd(), name='Searcher'):
         super().__init__(name, path)
         self.target=None
+        self.searchConfiguration()
 
+    def searchConfiguration(self):
         for file in walker(self.details.path):
             if TARGET in file:
                 self.target = file
@@ -65,26 +70,31 @@ class Searcher(Agent):
 class Interpreter(Agent):
     def __init__(self, target='',name='Interpreter',):
         super().__init__(name)
-        type_ = exts(basename(target))
         self.blueprint=None
+        self.loadBluePrint(target)
 
-        if type_ in INTERPRETABLE:
+    def loadBluePrint(self, target):
+        ext = exts(basename(target))
+        if ext in INTERPRETABLE:
             with open(target, 'r') as f:
                 self.blueprint = yaml.load(f)
             self.result = True
         self.Log()
 
-
 # Agent ( Generator )
 class Generator(Agent):
     def __init__(self,blueprint, name='Generator'):
         super().__init__(name)
-        self.Log()
+        self.Log(gp.marker.esclamation)
 
 
-# TESTING
-searcher = Searcher()
-if searcher.result:
-    interpreter = Interpreter(searcher.target)
-    if interpreter.result:
-        generator = Generator(interpreter.blueprint)
+
+# Testing in progress
+
+if __name__ == "__main__":
+
+    searcher = Searcher()
+    if searcher.result:
+        interpreter = Interpreter(searcher.target)
+        if interpreter.result:
+            generator = Generator(interpreter.blueprint)
