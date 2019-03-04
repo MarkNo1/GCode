@@ -1,1 +1,1 @@
-from gcode.generators.lib import *
+from .lib import *

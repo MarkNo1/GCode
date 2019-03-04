@@ -23,27 +23,28 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from .dictionary import Dictionary
+from .filesystem import path, pwd
+import os
 
-## Dictionary Extension
-class Dictionary(dict):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__dict__ = self
+make = lambda key, val : Dictionary({key:val})
 
-    def __getitem__(self, key):
-        if key in self:
-            return dict.__getitem__(self, key)
-
-    def __call__(self,  **kwargs):
-        for type, val in kwargs.items():
-            self[type]=val
-
-    def __getattr__(self, key):
-        if key in self:
-            dict.__getattr__(self, key)
+ROOT = 'root'
+DIRS = 'dirs'
+FILE = 'files'
 
 
-    __version__ = 0.3
+class Walker(Dictionary):
+    def __init__(self, path=pwd()):
+        super().__init__()
+        self[ ROOT ] = path
+        self[ DIRS ] = Dictionary()
+        self[ FILE ] = Dictionary()
 
-# Fresh
-Dict = Dictionary
+
+    def start(self):
+        for (dirpath, dirnames, filenames) in os.walk(self.root):
+            for dir in [ make(path(dirpath, folder), folder) for folder in dirnames]:
+                self.dirs = Dictionary(self.dirs, ** dir)
+            for f in [ make(path(dirpath, file), file) for file in filenames]:
+                self.files = Dictionary(self.files, ** f)

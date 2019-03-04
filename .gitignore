@@ -1,2 +1,6 @@
 */__pychache__
 *.pyc
+
+GCode/build/
+
+GCode/dist/

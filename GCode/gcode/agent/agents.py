@@ -66,6 +66,7 @@ class Searcher(Agent):
         self.Log()
 
 
+
 # Agent ( Interpreter )
 class Interpreter(Agent):
     def __init__(self, target='',name='Interpreter',):
@@ -80,6 +81,8 @@ class Interpreter(Agent):
                 self.blueprint = yaml.load(f)
             self.result = True
         self.Log()
+
+
 
 # Agent ( Generator )
 class Generator(Agent):

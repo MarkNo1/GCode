@@ -25,7 +25,7 @@
 
 
 ## FILES & FOLDERS
-import os
+import os, shutil
 
 # Read File
 read = lambda file: open(file, 'r').read()
@@ -59,6 +59,15 @@ mf=mkfile
 mkdir = lambda folder : os.mkdir(folder) if not exists(folder) else None
 md=mkdir
 
+# Remove Folder
+rmd = lambda folder : shutil.rmtree(folder)
+
+# Remove File
+rmf = lambda file : os.remove(file)
+
+# General Remove
+rm = lambda fd : rmf(fd) if isFile(fd) else rmd(fd)
+
 # Joint Path
 path = lambda parent, child : os.path.join(parent, child)
 p=path
@@ -80,10 +89,16 @@ basename = lambda path : os.path.basename(path)
 # File extension
 exts = lambda file : file.split('.')[1]
 
-# Walker
-# List of all files in directory tree at given path
-def walker(path):
-    all = list()
-    for (dirpath, dirnames, filenames) in os.walk(path):
-        all += [os.path.join(dirpath, file) for file in filenames]
-    return all
+# HD status
+disk_usage = shutil.disk_usage
+
+
+
+# Dimensions
+b = 8
+by = b
+Kby = 1000 * by
+Mby = 1000 * Kby
+Gby = 1000 * Mby
+Tby = 1000 * Gby
+Eby = 1000 * Tby
