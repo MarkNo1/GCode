@@ -24,53 +24,86 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from gcode.primitive import Dictionary
+from gcode.primitive.time import time
 
-class CppD2D(Dictionary):
-    pass
+# Generative helpers lambdas
 
-class CppOld:
+# CALL
+CALL = lambda **kwards : [D2Cpp[key](*val) for key, val in kwards.items()]
 
-    @staticmethod
-    def incipit(file_name, author, brief):
-        import datetime
-        now = datetime.datetime.now()
-        stars = '*' * 77 + '/\n'
-        carry_on = '/*!'
-        file_ = '\n*  @file \t {}'.format(file_name)
-        date_ = '\n*  @date \t ' + now.strftime("%Y.%m.%d")
-        author_ = '\n*  @author \t {}'.format(author)
-        brief_ = '\n*  @brief \t {}'.format(brief)
-        return '/' + stars + carry_on + file_ + date_ + author_ + brief_ + '\n' + stars
+# Incipit
+incipit = lambda name, brief : f'\
+/*****************************************************************************/\n\
+/*! \n\
+ *  @file 	 GComponent{name}.h \n\
+ *  @date 	 {time}\n\
+ *  @author 	Generated using GCode (M. Treglia Akka) \n\
+ *  @brief 	 {brief}\n\
+ *****************************************************************************/\n'
 
-    @staticmethod
-    def include(lib, message):
-        if '.h' in message:
-            message = message.split('.')[0]
-        return '#include <{0}/{1}.h>'.format(lib, message)
+# Include
+Include = lambda package, lib : f'#include <{package}/{lib}.h>'
 
-    @staticmethod
-    def declare_function(name, arguments, body, return_type):
-        return 'inline {0} {1}({2}){{\n{3}\n}}'.format(return_type, name, arguments, body)
+# Declare Function
+Dfunction = lambda name, return_type='', args='', body='' : f'\
+inline {return_type} {name}({args}){{\n {body} \n}}\n'
 
-    @staticmethod
-    def call_function(name, arguments):
-        return '{}({});'.format(name, arguments)
+# Call Function
+Cfunction = lambda name, args='' : f'{name}({args});\n'
 
-    @staticmethod
-    def declare_variable(type, name, initizalization=None):
-        if initizalization:
-            return '{} {} = {};\n'.format(type, name, initizalization)
-        else:
-            return '{} {};\n'.format(type, name)
+# Declare Variable
+Dvariable = lambda type, name, init=None : f'\
+{type} {name} = {init};\n' if init else f'{type} {name};\n'
 
-    @staticmethod
-    def declare_if(condition, body, body_else=None):
-        if body_else:
-            return 'if ({0}) {{\n{1}\n}}\nelse{{{2}\n}};\n'.format(condition,body,body_else)
-        else:
+# IF
+If = lambda condition, body, else_body=None: f'\
+if ({condition}) {{\n{body}\n}}\nelse{{{body_else}\n}};\n' if else_body \
+else f'if ({condition}) {{\n{body}\n}}\n;'
 
-            return 'if ({}) {\n{}\n};\n'.format(condition, body)
 
-    @staticmethod
-    def cast_to_string(param_name, param_type):
-        return param_name if 'String' in param_type else 'std::to_string({})'.format(param_name)
+# Dictionary to lambda
+D2Cpp = Dictionary(
+        Include   = Include,
+        Dfunction = Dfunction,
+        Cfunction = Cfunction,
+        Dvariable = Dvariable,
+        If = If)
+
+
+# Cpp generator
+
+DATA = 'data'
+CPP = 'cpp'
+
+
+class Cpp:
+    def __init__(self, data):
+        self.details = Dictionary()
+        self.details[ DATA ] = data
+        self.details[ CPP ] = ''
+
+    def generate(self):
+        self.flush()
+        for line in self.details.data:
+            print('Line: ',line)
+            for key, element in line.items():
+                print('Key: ', key)
+                print('Element',*element)
+                self.details.cpp += D2Cpp[key](*element)
+
+    def flush(self):
+        self.details.cpp = ''
+
+
+# TESTING
+if __name__ == '__main__':
+    data = [
+        {'Incipit'  : ['Alpha','Alpha is the first component generated']},
+        {'Dfunction': ['FunctionTest0','void']},
+        {'Dfunction': ['FunctionTest1','void', 'bool bool_']},
+        {'Dfunction': ['FunctionTest2','int', 'std::string number', 'return std::stoi(number)']},
+    ]
+
+    cpp = Cpp(data)
+
+    print(cpp.cpp)

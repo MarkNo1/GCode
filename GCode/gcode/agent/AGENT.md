@@ -7,9 +7,15 @@ Then it will does the Generation of the code.
 
 ###### flow
 
-  - search
-        gready search from path
-  - interpret
-        current file avaible [ yaml ]
-  - generate
-        working in progress ...
+### Searcher
+Given the path, it will perform a greedy search recursively in all the
+folder. It will return *result* True if it will find the ComponentList.
+
+### Interpret
+The Interpret receive the ComponentList file path from the *Searcher* and it will
+interpret in a dictionary it's contents.
+
+Available files type: [ yalm ]
+
+### Generator
+The Generator receiving the interpreted dictionary will generate the Components code.
