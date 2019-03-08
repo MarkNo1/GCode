@@ -1,16 +1,23 @@
 #! /usr/local/bin/python3.7
 
+verbose = '''
+
+    Clean Python cache 0.2
+
+'''
+
+
 __name__ == "__main__"
 
 from gcode.primitive.filesystem import pwd, rm
 from gcode.primitive.walker import Walker
 from gcode.primitive.style import LOG
 
+from gcode import Atom
+
+
 DIR_TARGET = ['__pycache__', '.egg-info',]
 
-w = Walker(pwd())
-
-w.start()
 
 for pdir, dir in w.dirs.items():
     for DIR in DIR_TARGET:

@@ -34,9 +34,12 @@ class Dictionary(dict):
         if key in self:
             return dict.__getitem__(self, key)
 
-    def __call__(self,  **kwargs):
-        for type, val in kwargs.items():
-            self[type]=val
+    def __call__(self, *args, **kwargs):
+        if args:
+            self[args]=args
+        if kwargs:
+            for type, val in kwargs.items():
+                self[type]=val
 
     def __getattr__(self, key):
         if key in self:

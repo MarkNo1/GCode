@@ -81,7 +81,8 @@ file_descriptor = lambda file : open(file, 'r')
 fd=file_descriptor
 
 # Current path
-pwd = lambda : os.getcwd()
+currentPath = lambda : os.getcwd()
+pwd = currentPath
 
 # Basename
 basename = lambda path : os.path.basename(path)

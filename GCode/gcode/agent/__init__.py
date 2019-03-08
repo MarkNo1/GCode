@@ -1,1 +1,2 @@
-from .agents import Agent, Searcher, Interpreter, Generator
+from .Agents import Finder
+from .BluePrint import BluePrint

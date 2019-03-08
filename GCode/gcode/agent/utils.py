@@ -23,30 +23,18 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .dictionary import Dictionary
-from .filesystem import path, pwd
-import os
+from gcode.primitive import pwd
+from gcode import Dictionary
+from gcode.primitive.style import LOG
 
-make = lambda key, val : Dictionary({key:val})
-
-ROOT = 'root'
-DIRS = 'dirs'
-FILE = 'files'
+from gcode import Atom
 
 
 
-class Walker(Dictionary):
-    def __init__(self, path=pwd()):
-        super().__init__()
-        self[ ROOT ] = path
-        self[ DIRS ] = Dictionary()
-        self[ FILE ] = Dictionary()
+# Log Interface
+class Atom(Dictionary):
 
+    root = pwd()
 
-    def start(self):
-        for (dirpath, dirnames, filenames) in os.walk(self.root):
-            for dir in [ make(path(dirpath, folder), folder) for folder in dirnames]:
-                self.dirs = Dictionary(self.dirs, ** dir).items()
-            for f in [ make(path(dirpath, file), file) for file in filenames]:
-                self.files = Dictionary(self.files, ** f).items()
-        return self
+    def Log(self, text, status=None):
+        print(f'{text} {LOG(status)}' if status is not None else f'{text}')

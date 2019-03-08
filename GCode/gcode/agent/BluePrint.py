@@ -23,30 +23,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .dictionary import Dictionary
-from .filesystem import path, pwd
-import os
 
-make = lambda key, val : Dictionary({key:val})
-
-ROOT = 'root'
-DIRS = 'dirs'
-FILE = 'files'
+import yaml
 
 
-
-class Walker(Dictionary):
-    def __init__(self, path=pwd()):
-        super().__init__()
-        self[ ROOT ] = path
-        self[ DIRS ] = Dictionary()
-        self[ FILE ] = Dictionary()
-
-
-    def start(self):
-        for (dirpath, dirnames, filenames) in os.walk(self.root):
-            for dir in [ make(path(dirpath, folder), folder) for folder in dirnames]:
-                self.dirs = Dictionary(self.dirs, ** dir).items()
-            for f in [ make(path(dirpath, file), file) for file in filenames]:
-                self.files = Dictionary(self.files, ** f).items()
-        return self
+class BluePrint():
+    pass
