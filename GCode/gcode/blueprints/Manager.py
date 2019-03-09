@@ -38,13 +38,13 @@ class BluePrintManagerBase(Mapper):
 # Manager
 class BluePrintManager(BluePrintManagerBase):
     def find(self):
+        self.Log('Searching for Components ... ')
         for path, file in  self['files']:
                 self.__add(file, path)
-        print(self['blueprints'])
 
     def load(self):
+        self.Log('Loading Components ... ')
         for blueprint in self.blueprints:
-            self.Log('Loading ')
             blueprint.load()
 
     def produce(self):
@@ -53,8 +53,11 @@ class BluePrintManager(BluePrintManagerBase):
 
     def __add(self, file, path):
         if self['target'] in file:
-            print(file, path)
             self.blueprints.append(BluePrint(file, path))
+            self.Log(f'Add {file}', True)
+
+    def show(self):
+        self.Log(f'Current BluePrints:\n{self.blueprints}')
 
 
 

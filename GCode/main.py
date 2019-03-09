@@ -8,3 +8,6 @@ bluem.find()
 
 # Load all
 bluem.load()
+
+# Show
+bluem.show()

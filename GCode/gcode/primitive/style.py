@@ -24,8 +24,6 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.""
 '''
 
-from .dictionary import Dictionary
-
 
 ## COLORS
 
@@ -43,7 +41,7 @@ StyleCode = lambda a, b, c : f'{a};{b};{c}'
 StyleCodeFromTable = lambda code : StyleCode(**code)
 
 # Get Text with Added Color
-StyledTextInternal = lambda color, text : f'\x1b[%sm {text} \x1b[0m' % (color)
+StyledTextInternal = lambda color, text : f'\x1b[%sm{text}\x1b[0m' % (color)
 
 # Get Style with human code
 UseStyle = lambda human_code, text: StyledTextInternal(STYLES_TABLE[human_code], text)
@@ -71,27 +69,29 @@ Header = lambda text: UseStyle(1679, text)
 TM = u"\u2122"
 
 # Faces emoticons
-faces = Dictionary(
-        happy=u'\U0001F603'.encode('utf-8'),
-        ops  =u'\U0001F605'.encode('utf-8'),
-        ish  =u'\U0001F601'.encode('utf-8'),
-        done =u'\U0001F60C'.encode('utf-8'),
-        sad  =u'\U0001F614'.encode('utf-8'),
-        angry=u'\U0001F621'.encode('utf-8'))
-
-# Markers emoticons
-marker = Dictionary(
-        success=u'\U00002705'.encode('utf-8'),
-        fail    =u'\U0000274C'.encode('utf-8'),
-        question =u'\U00002753'.encode('utf-8'),
-        esclamation=u'\U00002757'.encode('utf-8'))
+# faces = Dictionary(
+#         happy=u'\U0001F603'.encode('utf-8'),
+#         ops  =u'\U0001F605'.encode('utf-8'),
+#         ish  =u'\U0001F601'.encode('utf-8'),
+#         done =u'\U0001F60C'.encode('utf-8'),
+#         sad  =u'\U0001F614'.encode('utf-8'),
+#         angry=u'\U0001F621'.encode('utf-8'))
+#
+# # Markers emoticons
+# marker = Dictionary(
+#         success=u'\U00002705'.encode('utf-8'),
+#         fail    =u'\U0000274C'.encode('utf-8'),
+#         question =u'\U00002753'.encode('utf-8'),
+#         esclamation=u'\U00002757'.encode('utf-8'))
 
 # Add face emoticon
 Emoji = lambda unicode : unicode.decode('utf-8')
 
 
 # Logging
+fail_ = u'\U00002705'.encode('utf-8')
+success_ = u'\U00002705'.encode('utf-8')
 
-FAIL = lambda : Emoji(marker.fail)
-SUCCESS = lambda : Emoji(marker.success)
-LOG = lambda result : SUCCESS() if result else FAIL()
+FAIL = lambda : Emoji(fail)
+SUCCESS = lambda : Emoji(success_)
+Mark = lambda result : SUCCESS() if result else FAIL()

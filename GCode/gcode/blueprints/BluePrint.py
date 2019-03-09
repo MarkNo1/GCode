@@ -36,6 +36,9 @@ CONTENT = 'content'
 GENERATED = 'generated'
 
 
+# Style
+s_class = 610
+s_componentname = 708
 
 class BluePrintBase(Logger):
     def __init__(self, name, path):
@@ -44,17 +47,20 @@ class BluePrintBase(Logger):
         self[ NAME ] = name
         self[ CONTENT ] = None
         self[ GENERATED ] = Dictionary()
-        self['style']['_content'] = 6915
 
 
 class BluePrint(BluePrintBase):
 
     def load(self):
-        self.content = yaml.load(fd(self.root))
+        self.content = Dictionary(yaml.load(fd(self.root)))
+        self.Log(f'{self.name} loaded', True )
 
     def generate(self):
         pass
 
     def __repr__(self):
-        content_ = UseStyle(self['style']._content , self.content)
-        return super().__repr__() + content_
+        class_ = UseStyle(s_class ,self._class_)
+        name_ = UseStyle(s_componentname, self.name)
+        # born_ = UseStyle(self['style']._born, self.born)
+        # root_ =  UseStyle(self['style']._root , self.root)
+        return f'{class_} -> {name_}'
