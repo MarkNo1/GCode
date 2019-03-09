@@ -33,6 +33,10 @@ class Dictionary(dict):
     def __getitem__(self, key):
         if key in self:
             return dict.__getitem__(self, key)
+        try:
+            return self.__getattribute__(key)
+        except Exception as e:
+            pass
 
     def __call__(self, *args, **kwargs):
         if args:

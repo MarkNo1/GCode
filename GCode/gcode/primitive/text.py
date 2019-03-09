@@ -23,18 +23,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.primitive import pwd
-from gcode import Dictionary
-from gcode.primitive.style import LOG
 
-from gcode import Atom
-
-
-
-# Log Interface
-class Atom(Dictionary):
-
-    root = pwd()
-
-    def Log(self, text, status=None):
-        print(f'{text} {LOG(status)}' if status is not None else f'{text}')
+# Replace
+replace = lambda text, target, changer, count=None : text.replace(target, changer, count)

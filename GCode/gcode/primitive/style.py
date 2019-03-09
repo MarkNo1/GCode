@@ -86,7 +86,6 @@ marker = Dictionary(
         question =u'\U00002753'.encode('utf-8'),
         esclamation=u'\U00002757'.encode('utf-8'))
 
-u"\u2122"
 # Add face emoticon
 Emoji = lambda unicode : unicode.decode('utf-8')
 

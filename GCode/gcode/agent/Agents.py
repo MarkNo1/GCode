@@ -24,38 +24,34 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.""
 '''
 
-
 from gcode.primitive import exts, basename
 from gcode.primitive.walker import Walker
+from gcode.unit.Atoms import Mapper
 
-
-
-class Logging:
-    pass
-
-
-TYPE = '.Component'
 
 INTERPRETABLE = ['yaml']
 
 
-# Agent Interface
-class IAgent(Logging):
-    def __init__(self, name='DefaultAgent', blueprints=[]):
-        super().__init__(self)
-        root = ''
-        name = name
-        blueprints = blueprints
-
-
 # Finder
-class Finder(IAgent):
-    def search(self):
-        files = walker = Walker().start().files
+class Finder(Mapper):
+
+    name = 'Finder'
+    blueprints = []
+
+    target = '.Component'
+
+    def find(self):
+        for path, file in  self['files']:
+                self.blueprints.append(BluePrint(file, path))
+        Log(len(self.blueprints), Log(True if len(self.blueprints) > 1 else False))
+
+    def produce(self):
         for path, file in walker.files:
-            if TYPE in file:
-                self.blueprints.append(BluePrint)
-        self.Log()
+            self.__add(file, path)
+
+    def __add(self, BluePrint):
+        if target in file:
+            self.blueprints.append(BluePrint)
 
 
 

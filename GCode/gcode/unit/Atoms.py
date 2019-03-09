@@ -29,7 +29,7 @@
 license = f''' Designed for python 3.7
 
 
-    Copyright 2019  Marco Treglia   Version 0.4
+    @1 Copyright 2019  Marco Treglia @2 1F441  Version 0.4
 
     Redistribution and use in source and binary forms, with or without modification,
     are permitted provided that the following conditions are met:
@@ -56,11 +56,11 @@ license = f''' Designed for python 3.7
 
 
 from gcode.primitive.style import TM
-from gcode import New ,license
+from gcode.primitive.rapid import New
 from gcode.primitive.time import time
 from gcode import Dictionary
 from gcode.primitive.filesystem import pwd
-
+from gcode.primitive.walker import Walker
 
 '''
 @ ATOM
@@ -69,4 +69,20 @@ from gcode.primitive.filesystem import pwd
 class Atom(Dictionary):
     license = license
     root = pwd()
-    born = time
+    born = time()
+
+
+    def go(self, path):
+        self['root'] = path
+
+
+
+class Logger(Atom):
+    def Log(self, text, status=None):
+            print(f'{text} {LOG(status)}' if status is not None else f'{text}')
+
+
+
+class Mapper(Logger):
+    files = walker = Walker().start().files
+    dirs = walker = Walker().start().dirs

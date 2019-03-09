@@ -1,7 +1,7 @@
 
 License = f''' Designed for python 3.7
 
-    Copyright 2019  Marco Treglia   Version 0.4
+     Copyright 2019  @ Marco Treglia @ Version 0.4
 
     Redistribution and use in source and binary forms, with or without modification,
     are permitted provided that the following conditions are met:
@@ -26,7 +26,16 @@ License = f''' Designed for python 3.7
 '''
 
 from .filesystem import write
+from .text import replace
 
 
 # Create new file with X as content
 New = lambda file, X : write(file, X)
+
+
+# Substitute @world for world
+def substitute(text, target='@',  args=[] ):
+    result = text
+    for world in args:
+        result = replace(result, target, world, 1)
+    return result
