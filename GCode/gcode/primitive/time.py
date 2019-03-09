@@ -32,3 +32,5 @@ now = lambda : gmtime()
 
 # Time Now Formatted
 time = lambda : strftime('%Y.%m.%d.%H:%M', now())
+
+clock =  lambda : strftime('%H:%M:%S', now())

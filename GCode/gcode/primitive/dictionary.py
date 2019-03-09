@@ -23,12 +23,19 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from .style import UseStyle
+
+
+KEY_STYLE = 1426
+VAL_STYLE = 5331
+
 
 ## Dictionary Extension
 class Dictionary(dict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__dict__ = self
+        self._class_ = str(self.__class__).split('.')[-1].replace("'>", '')
 
     def __getitem__(self, key):
         if key in self:
@@ -49,8 +56,18 @@ class Dictionary(dict):
         if key in self:
             dict.__getattr__(self, key)
 
+    def __repr__(self):
+        to_print = ''
+        incipit = '\n'
+        for key, val in self.__dict__.items():
+            if key !='class_':
+                incipit='\n\t'
+            key_ = UseStyle(KEY_STYLE , key)
+            val_ = UseStyle(VAL_STYLE , val)
+            to_print += f'{incipit}{key_}: {val_}'
+        return to_print
 
-    __version__ = 0.3
+    __version__ = 0.4
 
 # Fresh
 Dict = Dictionary
