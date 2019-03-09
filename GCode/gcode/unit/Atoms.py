@@ -67,17 +67,22 @@ from gcode.primitive.walker import Walker
 @ ATOM
 '''
 
+STYLE = Dictionary(_class=5698, _born=9924,_root=4932)
+
 class Atom(Dictionary):
     license = license
     root = pwd()
     born = time()
-
+    style = STYLE
 
     def go(self, path):
         self['root'] = path
 
     def __repr__(self):
-        return f'[{self.__class__}]\nborn: {self.born}\nroot: {self.root}\n'
+        class_ = UseStyle(self['style']._class ,str(self.__class__).split('.')[-1].replace("'>", ''))
+        born_ = UseStyle(self['style']._born, self.born)
+        root_ =  UseStyle(self['style']._root , self.root)
+        return f'{class_}|{born_}|{root_}\n'
 
 
 
@@ -89,7 +94,7 @@ class Logger(Atom):
             if isinstance(status, bool):
                 to_print = f'{text} {LOG(status)}'
             if isinstance(status, int):
-                to_print = UseStyle(f'{text}')
+                to_print = UseStyle(int, text)
             if isinstance(status, list) and isinstance(text, list):
                 for t,s in zip(text,status):
                     to_print += UseStyle(s,f'{t}')

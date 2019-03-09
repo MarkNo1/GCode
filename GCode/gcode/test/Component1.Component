@@ -1,0 +1,31 @@
+Components:
+  -
+    name: Component0
+    package:  PackageComponent0
+    brief: Some details of what is doing this component.
+    details:
+
+      params:
+          -
+            name: velocity
+            type: float
+          -
+            name: x
+            type: float
+          -
+            name: y
+            type: float
+
+      topics:
+          -
+            type: publisher
+            name: position_x
+            msg : std_msgs::Float32
+          -
+            type: publisher
+            name: position_y
+            msg : std_msgs::Float32
+
+            type: subscriber
+            name: velocity
+            msg : std_msgs::Float32

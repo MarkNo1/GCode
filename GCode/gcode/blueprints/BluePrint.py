@@ -24,6 +24,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from gcode.primitive import fd
+from gcode.primitive import UseStyle
 from gcode import Dictionary
 from gcode.unit import Logger
 import yaml
@@ -39,16 +40,21 @@ GENERATED = 'generated'
 class BluePrintBase(Logger):
     def __init__(self, name, path):
         super().__init__()
+        self.go(path)
         self[ NAME ] = name
-        self[ PATH ] = path
         self[ CONTENT ] = None
         self[ GENERATED ] = Dictionary()
+        self['style']['_content'] = 6915
 
 
 class BluePrint(BluePrintBase):
 
     def load(self):
-        self.content = yaml.load(fd(self.path))
+        self.content = yaml.load(fd(self.root))
 
     def generate(self):
         pass
+
+    def __repr__(self):
+        content_ = UseStyle(self['style']._content , self.content)
+        return super().__repr__() + content_

@@ -52,7 +52,7 @@ UseStyle = lambda human_code, text: StyledTextInternal(STYLES_TABLE[human_code],
 STYLES_TABLE = dict( (idx,code) for idx, code in enumerate(list(map(StyleCodeFromTable, STYLES_))))
 
 # Print all avaible styles
-ShowAllStyles = lambda : print('STYLES TABLES\n\n' + ''.join([StyledTextInternal(style_code,human_code)
+ShowAllStyles = lambda : print('STYLES TABLES\n\n' + '\t'.join([StyledTextInternal(style_code,human_code)
                         for human_code, style_code in STYLES_TABLE.items()]))
 
 

@@ -27,35 +27,34 @@
 from gcode.primitive import exts, basename
 from gcode.primitive.walker import Walker
 from gcode.unit.Atoms import Mapper
+from .BluePrint import BluePrint
 
 
-INTERPRETABLE = ['yaml']
 
+class BluePrintManagerBase(Mapper):
+        blueprints = []
+        target = '.Component'
 
-# Finder
-class BluePrintManager(Mapper):
-
-    name = 'BluePrintManager'
-    blueprints = []
-
-    target = '.Component'
-
+# Manager
+class BluePrintManager(BluePrintManagerBase):
     def find(self):
         for path, file in  self['files']:
-                self.__add(BluePrint(file, path))
-        Log(len(self.blueprints), Log(True if len(self.blueprints) > 1 else False))
+                self.__add(file, path)
+        print(self['blueprints'])
 
     def load(self):
         for blueprint in self.blueprints:
+            self.Log('Loading ')
             blueprint.load()
 
     def produce(self):
         for blueprint in self.blueprints:
             blueprint.produce()
 
-    def __add(self, BluePrint):
-        if target in file:
-            self.blueprints.append(BluePrint)
+    def __add(self, file, path):
+        if self['target'] in file:
+            print(file, path)
+            self.blueprints.append(BluePrint(file, path))
 
 
 
