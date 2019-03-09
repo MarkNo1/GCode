@@ -55,7 +55,8 @@ license = f''' Designed for python 3.7
 '''
 
 
-from gcode.primitive.style import TM
+from gcode.primitive.style import TM, LOG
+from gcode.primitive.style import UseStyle
 from gcode.primitive.rapid import New
 from gcode.primitive.time import time
 from gcode import Dictionary
@@ -75,11 +76,27 @@ class Atom(Dictionary):
     def go(self, path):
         self['root'] = path
 
+    def __repr__(self):
+        return f'[{self.__class__}]\nborn: {self.born}\nroot: {self.root}\n'
+
 
 
 class Logger(Atom):
     def Log(self, text, status=None):
-            print(f'{text} {LOG(status)}' if status is not None else f'{text}')
+            to_print = ''
+            if status is None:
+                to_print = f'{text}'
+            if isinstance(status, bool):
+                to_print = f'{text} {LOG(status)}'
+            if isinstance(status, int):
+                to_print = UseStyle(f'{text}')
+            if isinstance(status, list) and isinstance(text, list):
+                for t,s in zip(text,status):
+                    to_print += UseStyle(s,f'{t}')
+
+            print(to_print)
+
+
 
 
 

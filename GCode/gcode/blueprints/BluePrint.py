@@ -23,9 +23,32 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+from gcode.primitive import fd
+from gcode import Dictionary
+from gcode.unit import Logger
 import yaml
 
 
-class BluePrint():
-    pass
+NAME = 'name'
+PATH = 'path'
+CONTENT = 'content'
+GENERATED = 'generated'
+
+
+
+class BluePrintBase(Logger):
+    def __init__(self, name, path):
+        super().__init__()
+        self[ NAME ] = name
+        self[ PATH ] = path
+        self[ CONTENT ] = None
+        self[ GENERATED ] = Dictionary()
+
+
+class BluePrint(BluePrintBase):
+
+    def load(self):
+        self.content = yaml.load(fd(self.path))
+
+    def generate(self):
+        pass

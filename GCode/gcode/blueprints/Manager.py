@@ -33,21 +33,25 @@ INTERPRETABLE = ['yaml']
 
 
 # Finder
-class Finder(Mapper):
+class BluePrintManager(Mapper):
 
-    name = 'Finder'
+    name = 'BluePrintManager'
     blueprints = []
 
     target = '.Component'
 
     def find(self):
         for path, file in  self['files']:
-                self.blueprints.append(BluePrint(file, path))
+                self.__add(BluePrint(file, path))
         Log(len(self.blueprints), Log(True if len(self.blueprints) > 1 else False))
 
+    def load(self):
+        for blueprint in self.blueprints:
+            blueprint.load()
+
     def produce(self):
-        for path, file in walker.files:
-            self.__add(file, path)
+        for blueprint in self.blueprints:
+            blueprint.produce()
 
     def __add(self, BluePrint):
         if target in file:

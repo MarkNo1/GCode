@@ -1,5 +1,0 @@
-gcode
-gcode/agent
-gcode/generators
-gcode/generators/lib
-gcode/primitive

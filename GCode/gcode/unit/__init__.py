@@ -1,1 +1,1 @@
-from . import Atoms
+from .Atoms import *
