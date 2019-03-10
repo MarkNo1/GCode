@@ -1,5 +1,6 @@
 name: Component1
-package:  PackageComponent1
+mode: RosNodelet
+package:  PackageComponent0
 brief: Some details of what is doing this component
 params:
   -

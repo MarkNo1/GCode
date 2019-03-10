@@ -1,13 +1,18 @@
 from gcode.blueprints.Manager import BluePrintManager
 
 
-bluem = BluePrintManager()
+if __name__ == '__main__':
+    # Start the manager in the current path
+    bluem = BluePrintManager()
 
-# Find all
-bluem.find()
+    # Find all
+    bluem.find()
 
-# Load all
-bluem.load()
+    # Load all
+    bluem.load()
 
-# Show
-bluem.show()
+    # Show BluePrints
+    bluem.show()
+
+    # Generate all
+    bluem.produce()

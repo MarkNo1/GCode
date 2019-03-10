@@ -30,13 +30,15 @@ from gcode.unit.Atoms import Mapper
 from .BluePrint import BluePrint
 
 
+COMPONENT = '.Component'
+FLOW = '.Flow'
 
-class BluePrintManagerBase(Mapper):
-        blueprints = []
-        target = '.Component'
 
 # Manager
-class BluePrintManager(BluePrintManagerBase):
+class BluePrintManager(Mapper):
+
+    blueprints = []
+
     def find(self):
         self.Log('Searching for Components ... ')
         for path, file in  self['files']:
@@ -52,12 +54,12 @@ class BluePrintManager(BluePrintManagerBase):
             blueprint.produce()
 
     def __add(self, file, path):
-        if self['target'] in file:
+        if COMPONENT in file or FLOW in file:
             self.blueprints.append(BluePrint(file, path))
-            self.Log(f'Add {file}', True)
+            self.Log(f'Added {file}', True)
 
     def show(self):
-        self.Log(f'Current BluePrints:\n{self.blueprints}')
+        self.Log(f'Current BluePrints: {len(self.blueprints)}\n{self.blueprints}')
 
 
 

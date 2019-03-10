@@ -6,8 +6,8 @@
  *  @brief 	 Generated ComponentName
  *****************************************************************************/
 
-#ifndef __GENERATED_COMPONENT_NAMECMP__
-#define __GENERATED_COMPONENT_NAMECMP__
+#ifndef __GENERATED_@ComponentName__
+#define __GENERATED_@ComponentName__
 
 #include <ros/ros.h>
 #include <renault_components/IComponent.h>
@@ -22,7 +22,7 @@ namespace generated {
    *  @brief  Generated ComponentName skeletons.
    */
 
-  class GComponentName : public IComponent {
+  class G@ComponentName : public IComponent {
    public:
      using IComponent::IComponent;
 
@@ -31,12 +31,6 @@ namespace generated {
      */
     virtual void RosParameters() final;
 
-    /**
-     * @brief Virtual. Initialize Algorithm Components.
-     *        This is not yet implemented. You have to override it
-     *        in the next phase
-     */
-    virtual void InitComponent() = 0;
 
     /**
      * @brief Virtual. Open Ros topic communications. (Publishers, Subscribers)
@@ -49,6 +43,15 @@ namespace generated {
     *
     */
     void CallbackName(const ros::MsgConstPtr & msg);
+
+
+    /**
+     * @brief Virtual. Initialize Algorithm Components.
+     *        This is not yet implemented. You have to override it
+     *        in the next phase
+     */
+    virtual void InitComponent() = 0;
+
 
   protected:
 

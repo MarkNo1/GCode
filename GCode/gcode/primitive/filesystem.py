@@ -56,7 +56,7 @@ mkfile = lambda file : write(file, '') if not exists(file) else None
 mf=mkfile
 
 # Create Folder
-mkdir = lambda folder : os.mkdir(folder) if not exists(folder) else None
+mkdir = lambda folder : os.makedirs(folder, exist_ok=True)
 md=mkdir
 
 # Remove Folder
@@ -69,7 +69,7 @@ rmf = lambda file : os.remove(file)
 rm = lambda fd : rmf(fd) if isFile(fd) else rmd(fd)
 
 # Joint Path
-path = lambda parent, child : os.path.join(parent, child)
+path = lambda *args : os.path.join(*list(args))
 p=path
 
 # List folder
@@ -87,11 +87,17 @@ pwd = currentPath
 # Basename
 basename = lambda path : os.path.basename(path)
 
+# Dir from file
+parent_dir = lambda file : '/'.join(file.split('/')[:-1])
+
 # File extension
-exts = lambda file : file.split('.')[1]
+exts = lambda file : file.split('.')[1] if '.' in file else None
 
 # HD status
 disk_usage = shutil.disk_usage
+
+# Get module path
+module_path = lambda module : parent_dir(module.__file__)
 
 
 

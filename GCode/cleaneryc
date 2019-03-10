@@ -2,7 +2,7 @@
 
 verbose = '''
 
-    Clean Python cache 0.2
+    Clean Python cache 0.3
 
 '''
 
@@ -22,5 +22,5 @@ DIR_TARGET = ['__pycache__', '.egg-info',]
 for pdir, dir in cleaner.dirs:
     for DIR in DIR_TARGET:
         if DIR in dir:
-            cleaner.Log(f'Deleted {pdir}', True)
             rm(pdir)
+            cleaner.Log(f'Deleted {pdir}', True)

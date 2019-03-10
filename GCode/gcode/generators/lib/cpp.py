@@ -88,8 +88,8 @@ class Cpp:
             print('Line: ',line)
             for key, element in line.items():
                 print('Key: ', key)
-                print('Element',*element)
-                self.details.cpp += D2Cpp[key](*element)
+                print('Element: ',*element)
+                self.details.cpp += CALL(line)
 
     def flush(self):
         self.details.cpp = ''

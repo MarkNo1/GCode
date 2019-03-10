@@ -23,30 +23,59 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.primitive import fd
+from gcode.primitive import fd, exists, mkdir, path
 from gcode.primitive import UseStyle
 from gcode import Dictionary
 from gcode.unit import Logger
+from gcode.generators import Components
 import yaml
 
-
+# BluePrint Variables
 NAME = 'name'
 PATH = 'path'
 CONTENT = 'content'
 GENERATED = 'generated'
+COMPONENT = 'component'
+
+# Componet Variable
+PKG = 'package'
+MODE = 'mode'
+BRIEF = 'brief'
+PARAMS = 'params'
+# Params
+TYPE = 'type'
+TOPICS = 'topics'
+# Topics
+MSG = 'msg'
 
 
 # Style
 s_class = 610
 s_componentname = 708
 
+
 class BluePrintBase(Logger):
     def __init__(self, name, path):
         super().__init__()
         self.go(path)
+
         self[ NAME ] = name
         self[ CONTENT ] = None
         self[ GENERATED ] = Dictionary()
+        self[ COMPONENT ] = None
+
+    def _create_component(self):
+        self.Log('Mode: ' + self.content[ MODE ])
+        if self.content.mode == 'RosNodelet':
+            self.component = Components.RosNodelet(self.content)
+
+
+    def __repr__(self):
+        class_ = UseStyle(s_class ,self._class_)
+        name_ = UseStyle(s_componentname, self.name)
+        return f'{class_} -> {name_}'
+
+
 
 
 
@@ -56,10 +85,7 @@ class BluePrint(BluePrintBase):
         self.content = Dictionary(yaml.load(fd(self.root)))
         self.Log(f'{self.name} loaded', True )
 
-    def generate(self):
-        pass
-
-    def __repr__(self):
-        class_ = UseStyle(s_class ,self._class_)
-        name_ = UseStyle(s_componentname, self.name)
-        return f'{class_} -> {name_}'
+    def produce(self):
+        # Create the suited component
+        self._create_component()
+        self.component.generate()
