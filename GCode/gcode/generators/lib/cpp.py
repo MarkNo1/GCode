@@ -25,50 +25,72 @@
 
 from gcode.primitive import Dictionary
 from gcode.primitive.time import time
+'''
+        CALL - TO-DO
+'''
+# CALL = lambda **kwards : [D2Cpp[key](*val) for key, val in kwards.iterate()],
 
-# Generative helpers lambdas
 
-# CALL
-CALL = lambda **kwards : [D2Cpp[key](*val) for key, val in kwards.items()]
 
-# Incipit
-incipit = lambda name, brief : f'\
-/*****************************************************************************/\n\
-/*! \n\
- *  @file 	 GComponent{name}.h \n\
- *  @date 	 {time}\n\
- *  @author 	Generated using GCode (M. Treglia Akka) \n\
- *  @brief 	 {brief}\n\
- *****************************************************************************/\n'
 
-# Include
-Include = lambda package, lib : f'#include <{package}/{lib}.h>'
 
-# Declare Function
-Dfunction = lambda name, return_type='', args='', body='' : f'\
-inline {return_type} {name}({args}){{\n {body} \n}}\n'
 
-# Call Function
-Cfunction = lambda name, args='' : f'{name}({args});\n'
 
-# Declare Variable
-Dvariable = lambda type, name, init=None : f'\
-{type} {name} = {init};\n' if init else f'{type} {name};\n'
 
-# IF
-If = lambda condition, body, else_body=None: f'\
-if ({condition}) {{\n{body}\n}}\nelse{{{body_else}\n}};\n' if else_body \
-else f'if ({condition}) {{\n{body}\n}}\n;'
 
+
+
+'''
+    Tedius Mapping variables -> expressions
+
+    (*) it means optional
+
+'''
+D2Cpp = Dictionary(
+    # Incipit: name, brief
+    incipit = lambda name, brief : f'\
+    /**************************************************************************\n\
+     * \n\
+     *  @file 	 GComponent{name}.h \n\
+     *  @date 	 {time}\n\
+     *  @author 	Generated using GCode (T.M. Akka) \n\
+     *  @brief 	 {brief}\n\
+     *************************************************************************/\n',
+
+    # Include: pacakge, lib
+    include = lambda package, lib : f'#include <{package}/{lib}.h>',
+
+    # Namespace name body
+    namespace = lambda name, body : f'namespace {name} {{ {body} }};',
+
+    # Using lib, *alias
+    using = lambda  lib, alias=None : f'using {alias} = {lib};' if alias else f'using {lib};',
+
+    # Declare function name, *return_type, *args, *body
+    decl_function = lambda name, return_type='void', args='', body='' : f'\
+    inline {return_type} {name}({args}){{\n {body} \n}}\n',
+
+    # Call function name, *args
+    call_function = lambda name, args='' : f'{name}({args});\n',
+
+    # Declare Variable: type, name, *init
+    decl_variable = lambda type, name, init=None : f'\
+    {type} {name} = {init};\n' if init else f'{type} {name};\n'
+
+    # If: condition, body, *else_body
+    If = lambda condition, body, else_body=None: f'\
+    if ({condition}) {{\n{body}\n}}\nelse{{{body_else}\n}};\n' if else_body \
+    else f'if ({condition}) {{\n{body}\n}}\n;'
+)
 
 # Dictionary to lambda
-D2Cpp = Dictionary(
-        Include   = Include,
-        Dfunction = Dfunction,
-        Cfunction = Cfunction,
-        Dvariable = Dvariable,
-        If = If)
-
+# D2Cpp = Dictionary(
+#       #  Include   = Include,
+#       #  Using   = Using,
+#       #  Dfunction = Dfunction,
+#       #  Cfunction = Cfunction,
+#       #  Dvariable = Dvariable,
+#         If = If)
 
 # Cpp generator
 

@@ -33,7 +33,7 @@ from .BluePrint import BluePrint
 COMPONENT = '.Component'
 FLOW = '.Flow'
 
-STYLE_WHITE = 6277
+white = 6277
 
 # Manager
 class BluePrintManager(Mapper):
@@ -41,12 +41,12 @@ class BluePrintManager(Mapper):
     blueprints = []
 
     def find(self):
-        self.Log('Searching for BluePrints ... ', STYLE_WHITE)
-        for path, file in  self['files']:
+        self.Log('Searching for BluePrints ... ', white)
+        for path, file in self['files']:
                 self.__add(file, path)
 
     def load(self):
-        self.Log('Loading BluePrints ... ', STYLE_WHITE)
+        self.Log('Loading Components ... ', white)
         for blueprint in self.blueprints:
             blueprint.load()
 
