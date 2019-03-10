@@ -28,7 +28,7 @@ from gcode.primitive.style import TM, Mark
 from gcode.primitive.style import UseStyle
 from gcode.primitive.rapid import New
 from gcode.primitive.time import time, clock
-from gcode.primitive.filesystem import pwd, write, mkdir, exists, exts, parent_dir
+from gcode.primitive.filesystem import pwd, read, write, mkdir, exists, exts, parent_dir
 from gcode.primitive.walker import Walker
 from gcode import Dictionary
 
@@ -36,20 +36,35 @@ from gcode import Dictionary
 @ ATOM
 '''
 
-DEFAULT_STYLE_CLASS = 5173
+DEFAULT_STYLE_CLASS = 610
 
 # Styles
 # new
 STYLE_NEW = 6770
 STYLE_REPLACE = 6849
 STYLE_NOTHING = 6277
+STYLE_ERROR = 11023
+DEFAULT_STYLE_SPEC = 6420
 
 
-class Atom(Dictionary):
+class InterfaceAtom(Dictionary):
+    def __init__(self, name=''):
+        super().__init__()
+        self._specialized_ = self.__add_specialization(name)
+
+    def __add_specialization(self, specialization):
+        if specialization:
+            if '.' in specialization:
+                specialization = specialization.split('.')[0]
+        return specialization
+
+
+class Atom(InterfaceAtom):
     license = license
     root = pwd()
     born = time()
     class_style = DEFAULT_STYLE_CLASS
+    specialized_style = DEFAULT_STYLE_SPEC
 
     def go(self, path):
         self['root'] = path
@@ -57,7 +72,10 @@ class Atom(Dictionary):
 
 class Logger(Atom):
     def Log(self, text, status=None):
-            to_print = f'{clock()}:{UseStyle( self.class_style ,self._class_)} '
+            c = UseStyle( self.class_style , self._class_)
+            s = UseStyle( self.specialized_style , self._specialized_)
+            name = f"{c}.{s}" if self._specialized_ else c
+            to_print = f'{clock()}:{UseStyle( self.class_style , name)} '
             if status is None:
                 to_print += f'{text}'
             elif isinstance(status, bool):
@@ -109,9 +127,16 @@ class InterfaceBuilder(Logger):
 
 
 
+
 class Builder(InterfaceBuilder):
     def new(self, x, content=''):
         if exts(x):
             self._safe_new_file(x, content)
         else:
             self._new_dir(x)
+
+    def read(self, file):
+        if not exists(file):
+            self.Log(f'File not exist: {UseStyle(STYLE_ERROR, file)}')
+            return None
+        return read(file)

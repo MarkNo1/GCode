@@ -25,59 +25,67 @@
 
 from gcode import Dictionary
 from gcode.unit.Atoms import Builder
-from gcode.primitive.filesystem import module_path, path, read
+from gcode.primitive.filesystem import module_path, path, read, exists
 
 import gcode.generators as gg
 
 SUPPORTED_MODE = ['RosNodelet']
 
 
-# Componet Variables
-RESOURCES = 'resources'
-DATA = 'data'
-MODE = 'mode'
-HEADERs = 'headers'
-CPPs = 'cpps'
-XMLs = 'xmls'
-PKGXML = 'packagexml'
-CMAKE = 'cmake'
-
-
 '''
     Component
 '''
+
+green = 6770
+white = 6277
+
+DATA = 'data'
+
 class Component(Builder):
     def __init__(self, content=None):
-        super().__init__()
+        specialized = content['name']
+        super().__init__(specialized)
         self[ DATA ] = content
         # self.go(content[''])
+        self.Log('Created.', green)
+
 
     def _working_dir(self):
         pass
 
+    def _load_resource_file(self, file):
+        gen_path = module_path(gg)
+        file_path = path(gen_path, 'resources', file)
+        return self.read(file_path)
+
 
 
 '''
-    Interface RosNodelet
+    Interface Componet RosNodelet
 '''
+
+RESOURCES_ROSNODELET = Dictionary(
+    headers= Dictionary(IComponent='IComponentv1.h'),
+
+)
+
 class InterfaceRosNodelet(Component):
-    def __init__(self, content):
-        super().__init__()
-        self[ RESOURCES ] = Dictionary()
-        self[ DATA ] = content
-        self[ MODE ] = None
-        self[ HEADERs ] = None
-        self[ CPPs ] = None
-        self[ XMLs ] = None
-        self[ PKGXML ] = None
-        self[ CMAKE ] = None
-
+    resources = Dictionary()
+    mode = None
+    header = None
+    cpp = None
+    xml = None
+    pkgxml = None
+    cmake = None
 
 
     def _load_resources(self):
-        gen_path = module_path(gg)
-        self.resources['IComponentHeader'] = read(path(gen_path, 'resources', 'IComponent.0.1.h'))
-        
+        for type, resource in RESOURCES_ROSNODELET.iterate():
+            self.resources[type] = Dictionary()
+            for name, file in resource.iterate():
+                self.Log(f'Loading {file}')
+                self.resources[type][name] = self._load_resource_file(file)
+
 
     def _header(self):
         pass

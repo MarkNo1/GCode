@@ -12,7 +12,7 @@ if __name__ == '__main__':
     bluem.load()
 
     # Show BluePrints
-    bluem.show()
+    #bluem.show()
 
     # Generate all
     bluem.produce()

@@ -33,6 +33,7 @@ from .BluePrint import BluePrint
 COMPONENT = '.Component'
 FLOW = '.Flow'
 
+STYLE_WHITE = 6277
 
 # Manager
 class BluePrintManager(Mapper):
@@ -40,12 +41,12 @@ class BluePrintManager(Mapper):
     blueprints = []
 
     def find(self):
-        self.Log('Searching for Components ... ')
+        self.Log('Searching for BluePrints ... ', STYLE_WHITE)
         for path, file in  self['files']:
                 self.__add(file, path)
 
     def load(self):
-        self.Log('Loading Components ... ')
+        self.Log('Loading BluePrints ... ', STYLE_WHITE)
         for blueprint in self.blueprints:
             blueprint.load()
 
@@ -56,87 +57,6 @@ class BluePrintManager(Mapper):
     def __add(self, file, path):
         if COMPONENT in file or FLOW in file:
             self.blueprints.append(BluePrint(file, path))
-            self.Log(f'Added {file}', True)
 
     def show(self):
         self.Log(f'Current BluePrints: {len(self.blueprints)}\n{self.blueprints}')
-
-
-
-
-
-
-
-
-
-
-'''
-        PREPARING RESTYLE v0.4
-
-'''
-
-
-
-# Agent
-class Agent:
-    def __init__(self, name, path=''):
-        self.details = Dictionary()
-        self.details[ NAME ] = name
-        self.details[ BLUEPRINTS ] = path
-        self.result=False
-
-    def Log(self, emojy=None):
-        result = Emoji(emojy) if emojy else LOG(self.result)
-        print(f'{self.details.name}: {result} ')
-
-
-
-# Agent ( Searcher )
-class Searcher(Agent):
-    def __init__(self,path='', name='Searcher'):
-        super().__init__(name, path)
-        self.target=None
-        self.searchConfiguration()
-
-    def searchConfiguration(self):
-        for file in walker(self.details.path):
-            if TARGET in file:
-                self.target = file
-                self.result = True
-        self.Log()
-
-
-
-# Agent ( Interpreter )
-class Interpreter(Agent):
-    def __init__(self, target='',name='Interpreter',):
-        super().__init__(name)
-        self.blueprint=None
-        self.loadBluePrint(target)
-
-    def loadBluePrint(self, target):
-        ext = exts(basename(target))
-        if ext in INTERPRETABLE:
-            with open(target, 'r') as f:
-                self.blueprint = yaml.load(f)
-            self.result = True
-        self.Log()
-
-
-
-# Agent ( Generator )
-class Generator(Agent):
-    def __init__(self,blueprint, name='Generator'):
-        super().__init__(name)
-
-
-
-# Testing in progress
-
-if __name__ == "__main__":
-
-    searcher = Searcher()
-    if searcher.result:
-        interpreter = Interpreter(searcher.target)
-        if interpreter.result:
-            generator = Generator(interpreter.blueprint)

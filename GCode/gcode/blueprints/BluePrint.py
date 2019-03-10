@@ -52,30 +52,21 @@ MSG = 'msg'
 # Style
 s_class = 610
 s_componentname = 708
-
+green = 6770
+white = 6277
 
 class BluePrintBase(Logger):
     def __init__(self, name, path):
-        super().__init__()
+        super().__init__(name)
         self.go(path)
-
-        self[ NAME ] = name
         self[ CONTENT ] = None
         self[ GENERATED ] = Dictionary()
         self[ COMPONENT ] = None
+        self.Log('Created.', green)
 
     def _create_component(self):
-        self.Log('Mode: ' + self.content[ MODE ])
         if self.content.mode == 'RosNodelet':
             self.component = Components.RosNodelet(self.content)
-
-
-    def __repr__(self):
-        class_ = UseStyle(s_class ,self._class_)
-        name_ = UseStyle(s_componentname, self.name)
-        return f'{class_} -> {name_}'
-
-
 
 
 
@@ -83,9 +74,10 @@ class BluePrint(BluePrintBase):
 
     def load(self):
         self.content = Dictionary(yaml.load(fd(self.root)))
-        self.Log(f'{self.name} loaded', True )
+        self.Log('Created.', green)
 
     def produce(self):
+        self.Log('Producing ...', white)
         # Create the suited component
         self._create_component()
         self.component.generate()

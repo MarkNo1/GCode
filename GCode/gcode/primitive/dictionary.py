@@ -41,7 +41,8 @@ class Dictionary(dict):
         if key in self:
             return dict.__getitem__(self, key)
         try:
-            return self.__getattribute__(key)
+            if key != '_class_':
+                return self.__getattribute__(key)
         except Exception as e:
             pass
 
@@ -49,8 +50,7 @@ class Dictionary(dict):
         if args:
             self[args]=args
         if kwargs:
-            for type, val in kwargs.items():
-                self[type]=val
+            self.__setitem__(**kwargs)
 
     def __getattr__(self, key):
         if key in self:
@@ -60,14 +60,20 @@ class Dictionary(dict):
         to_print = ''
         incipit = '\n'
         for key, val in self.__dict__.items():
-            if key !='class_':
+            if key !='_class_':
                 incipit='\n\t'
             key_ = UseStyle(KEY_STYLE , key)
             val_ = UseStyle(VAL_STYLE , val)
             to_print += f'{incipit}{key_}: {val_}'
         return to_print
 
-    __version__ = 0.4
+    def iterate(self):
+        for key, var in self.__dict__.items():
+            if key !='_class_':
+                yield key, var
+
+
+    __version__ = 0.5
 
 # Fresh
 Dict = Dictionary
