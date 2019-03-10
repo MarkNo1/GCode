@@ -47,6 +47,9 @@ STYLE_ERROR = 11023
 DEFAULT_STYLE_SPEC = 6420
 
 
+'''
+    INTERFACE ATOM
+'''
 class InterfaceAtom(Dictionary):
     def __init__(self, name=''):
         super().__init__()
@@ -58,7 +61,9 @@ class InterfaceAtom(Dictionary):
                 specialization = specialization.split('.')[0]
         return specialization
 
-
+'''
+    ATOM
+'''
 class Atom(InterfaceAtom):
     license = license
     root = pwd()
@@ -66,10 +71,18 @@ class Atom(InterfaceAtom):
     class_style = DEFAULT_STYLE_CLASS
     specialized_style = DEFAULT_STYLE_SPEC
 
+
+'''
+    MOUVABLE
+'''
+class Mouvable(Atom):
     def go(self, path):
         self['root'] = path
 
 
+'''
+    LOGGER
+'''
 class Logger(Atom):
     def Log(self, text, status=None):
             c = UseStyle( self.class_style , self._class_)
@@ -89,54 +102,89 @@ class Logger(Atom):
             print(to_print)
 
 
-class Mapper(Logger):
-    files = walker = Walker().start().files
-    dirs = walker = Walker().start().dirs
-
 
 '''
-    Builder
+    DIRECTORY
 '''
-class InterfaceBuilder(Logger):
-
-    # New file
-    def _new_file(self, file, content=''):
-        log = ''
-        if not exists(file):
-            write(file, content)
-            log = f'File created: {UseStyle(STYLE_NEW, file)}'
-        else:
-            write(file, content)
-            log = f'File replaced: {UseStyle(STYLE_REPLACE, file)}'
-        self.Log(log)
-
-    # New Dir
-    def _new_dir(self, dir):
+class Dir(Logger):
+    def make_dir(self, dir):
         log = f'Directory already exist: {UseStyle(STYLE_NOTHING, dir)}'
         if not exists(dir):
             mkdir(dir)
             log = f'Directory created: {UseStyle(STYLE_NEW, dir)}'
         self.Log(log)
 
-
-    # Safe new
-    def _safe_new_file(self, file, content=''):
+    def dir_validator(self, file):
         dir = parent_dir(file)
-        self._new_dir(dir)
-        self._new_file(file, content)
+        self.make_dir(dir)
 
 
+'''
+    FILE
+'''
+class File(Dir):
+    def __init__(self, name, path):
+        super().__init__(name)
+        self.name = name
+        self.root = path
+        self.exist()
 
+    def write(self, content):
+        self.dir_validator(self.root)
+        write(self.root, content)
+        self.Log(self.__log_rewrite() if self.exist else self.__log_new())
 
-class Builder(InterfaceBuilder):
-    def new(self, x, content=''):
-        if exts(x):
-            self._safe_new_file(x, content)
-        else:
-            self._new_dir(x)
-
-    def read(self, file):
-        if not exists(file):
-            self.Log(f'File not exist: {UseStyle(STYLE_ERROR, file)}')
+    def read(self):
+        if not self.exist():
+            self.Log(self.__log_error())
             return None
-        return read(file)
+        self.Log(self.__log_read(), STYLE_NEW)
+        return read(self.root)
+
+    def __log_new(self):
+        return f'Created: {UseStyle(STYLE_NEW, self.root)}'
+
+    def __log_rewrite(self):
+        return f'Replaced: {UseStyle(STYLE_REPLACE, self.root)}'
+
+    def __log_error(self):
+        return f'File not exist: {UseStyle(STYLE_ERROR, self.root)}'
+
+    def __log_read(self):
+        return f'Read: {self.root}'
+
+    def exist(self):
+        self.exists = exists(self.root)
+        return self.exist
+
+
+'''
+    MAPPER
+'''
+class Mapper(Logger):
+    files = walker = Walker().start().files
+    dirs = walker = Walker().start().dirs
+
+
+
+class List(Atom):
+    def __init__(self, name='', data=[]):
+        super().__init__(name)
+        self.__init(data)
+
+    def __init(self, data):
+        if isinstance(data, list):
+            self.data = data
+        else:
+            self.data = [data]
+
+    def __call__(self):
+        for var in self.data:
+            yield var
+
+    def add(self, val):
+        self.data.append(val)
+        return self
+
+    def __len__(self):
+        return len(data)

@@ -26,8 +26,8 @@
 from gcode.primitive import fd, exists, mkdir, path
 from gcode.primitive import UseStyle
 from gcode import Dictionary
-from gcode.unit import Logger
-from gcode.generators import Components
+from gcode.unit import Logger, Mouvable
+from gcode.generators import RosNodelet
 import yaml
 
 # BluePrint Variables
@@ -55,7 +55,7 @@ s_componentname = 708
 green = 6770
 white = 6277
 
-class BluePrintBase(Logger):
+class BluePrintBase(Logger, Mouvable):
     def __init__(self, name, path):
         super().__init__(name)
         self.go(path)
@@ -66,7 +66,7 @@ class BluePrintBase(Logger):
 
     def _create_component(self):
         if self.content.mode == 'RosNodelet':
-            self.component = Components.RosNodelet(self.content)
+            self.component = RosNodelet(self.content)
 
 
 
@@ -74,10 +74,10 @@ class BluePrint(BluePrintBase):
 
     def load(self):
         self.content = Dictionary(yaml.load(fd(self.root)))
-        self.Log('Created.', green)
+        self.Log('Configuration Loaded.', green)
 
     def produce(self):
-        self.Log('Producing ...', white)
+        self.Log('Producing Component', white)
         # Create the suited component
         self._create_component()
         self.component.generate()

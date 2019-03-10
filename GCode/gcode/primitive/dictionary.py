@@ -46,11 +46,10 @@ class Dictionary(dict):
         except Exception as e:
             pass
 
-    def __call__(self, *args, **kwargs):
-        if args:
-            self[args]=args
-        if kwargs:
-            self.__setitem__(**kwargs)
+    def __call__(self):
+        for key, var in self.__dict__.items():
+            if key !='_class_':
+                yield key, var
 
     def __getattr__(self, key):
         if key in self:
@@ -67,13 +66,8 @@ class Dictionary(dict):
             to_print += f'{incipit}{key_}: {val_}'
         return to_print
 
-    def iterate(self):
-        for key, var in self.__dict__.items():
-            if key !='_class_':
-                yield key, var
 
-
-    __version__ = 0.5
+    __version__ = 0.6
 
 # Fresh
 Dict = Dictionary

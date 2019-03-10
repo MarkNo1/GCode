@@ -1,4 +1,4 @@
-from gcode.blueprints.Manager import BluePrintManager
+from gcode import BluePrintManager
 
 
 if __name__ == '__main__':

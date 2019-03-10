@@ -27,7 +27,7 @@
 from gcode.primitive import exts, basename
 from gcode.primitive.walker import Walker
 from gcode.unit.Atoms import Mapper
-from .BluePrint import BluePrint
+from gcode.blueprints import BluePrint
 
 
 COMPONENT = '.Component'
@@ -41,16 +41,18 @@ class BluePrintManager(Mapper):
     blueprints = []
 
     def find(self):
-        self.Log('Searching for BluePrints ... ', white)
+        self.Log('Searching for BluePrints', white)
         for path, file in self['files']:
                 self.__add(file, path)
 
+
     def load(self):
-        self.Log('Loading Components ... ', white)
+        self.Log('Loading BluePrint', white)
         for blueprint in self.blueprints:
             blueprint.load()
 
     def produce(self):
+        self.Log('Producing BluePrint', white)
         for blueprint in self.blueprints:
             blueprint.produce()
 

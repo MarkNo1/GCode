@@ -24,10 +24,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from gcode import Dictionary
-from gcode.unit.Atoms import Builder
+from gcode.unit.Atoms import Atom, Logger, File, List
 from gcode.primitive.filesystem import module_path, path, read, exists
-
-import gcode.generators as gg
+import gcode
 
 SUPPORTED_MODE = ['RosNodelet']
 
@@ -41,36 +40,38 @@ white = 6277
 
 DATA = 'data'
 
-class Component(Builder):
-    def __init__(self, content=None):
-        specialized = content['name']
-        super().__init__(specialized)
-        self[ DATA ] = content
-        # self.go(content[''])
-        self.Log('Created.', green)
+MODULE_PATH = module_path(gcode)
 
-
-    def _working_dir(self):
-        pass
-
-    def _load_resource_file(self, file):
-        gen_path = module_path(gg)
-        file_path = path(gen_path, 'resources', file)
-        return self.read(file_path)
-
+relative_path = lambda file :  f'{MODULE_PATH}/resources/{file}'
 
 
 '''
-    Interface Componet RosNodelet
+    Ros Nodelet Component
+____________________
 '''
 
-RESOURCES_ROSNODELET = Dictionary(
-    headers= Dictionary(IComponent='IComponentv1.h'),
 
-)
+'''
+    Resources
+'''
+white = 6277
 
-class InterfaceRosNodelet(Component):
-    resources = Dictionary()
+
+class ResourcesRosNodelet(Logger):
+    headers = List('Headers', File('IComponentHeader', relative_path('IComponentv1.h')))
+
+    def load_resource(self):
+        self.Log('Reading resources', white)
+        for file in self.headers():
+            self[file.name] = file.read()
+
+
+'''
+    Variable
+'''
+
+
+class VariableRosNodelet(Dictionary):
     mode = None
     header = None
     cpp = None
@@ -79,13 +80,24 @@ class InterfaceRosNodelet(Component):
     cmake = None
 
 
-    def _load_resources(self):
-        for type, resource in RESOURCES_ROSNODELET.iterate():
-            self.resources[type] = Dictionary()
-            for name, file in resource.iterate():
-                self.Log(f'Loading {file}')
-                self.resources[type][name] = self._load_resource_file(file)
+'''
+    Interface
+'''
 
+
+class InterfaceRosNodeletComponet(ResourcesRosNodelet, VariableRosNodelet):
+    def __init__(self, content=None):
+        super().__init__(content ['name'])
+        self.data = content
+        self.load_resource()
+
+
+'''
+    RosNodelet
+'''
+
+
+class RosNodelet(InterfaceRosNodeletComponet):
 
     def _header(self):
         pass
@@ -102,17 +114,26 @@ class InterfaceRosNodelet(Component):
     def _cmake(self):
         pass
 
-
-'''
-    RosNodelet
-'''
-class RosNodelet(InterfaceRosNodelet):
     def generate(self):
         # Load Preset
-        self._load_resources()
-
         self._header()
         self._cpp()
         self._xml()
         self._packagexml()
         self._cmake()
+
+
+
+# class StructuRosNodelet()
+# Incipit
+# IfDef
+# Includes
+# Namespace
+#   Class
+#     public
+#       Using
+#       Funcs
+#     protected
+#       Variables
+#     private
+#       Variables
