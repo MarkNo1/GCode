@@ -28,14 +28,14 @@ from gcode.unit.base import Atom
 from gcode.unit.logger import  Logger
 from gcode.unit.system import  File, Dir, Mouvable
 from gcode.primitive.filesystem import module_path, path, read, exists
+from .lib import CppMapping
 import gcode
+
+D = Dictionary
 
 '''
     Ros Nodelet Component
 '''
-
-green = 6770
-white = 6277
 
 DATA = 'data'
 
@@ -48,21 +48,42 @@ relative_path = lambda file :  f'{MODULE_PATH}/resources/{file}'
 '''
     Resources
 '''
-white = 6277
+class CppHandler(Atom):
+    def __init__(self, name, package, folder=None):
+        super().__init__(name)
+        self.name = name
+        self.package = package
+        # Folders path
+        self.headers_path = self.__header_path(folder)
+        self.sources_path = self.__source_path(folder)
+        header_name = f'{self.name}.h'
+        source_name = f'{self.name}.cc'
+        # Header file
+        self.header = File(f'{self.name}Header', path(self.headers_path, header_name))
+        # Source file
+        self.source = File(f'{self.name}Source', path(self.sources_path, source_name ))
 
+    def __header_path(self, folder):
+        root = path(self.package, 'include', self.package)
+        if folder != None:
+            root = path(root, folder)
+        return root
 
+    def __source_path(self, folder):
+        root = path(self.package, 'src')
+        if folder != None:
+            root = path(root, folder)
+        return root
 
-class Headers(Atom):
-    InterfaceHeader =  File('IComponentH', relative_path('IComponentv1.h'))
-    GeneratorHeader =  File('GComponentH', relative_path('GComponentv1.h'))
+    def init(self):
+        self.header.write('')
+        self.source.write('')
 
-class ResourcesRosNodelet(Atom):
-    headers = Headers()
-
-
-'''
-    Variable
-'''
+class Interface(Atom):
+    header =  File('IComponentH', relative_path('IComponentv1.h'))
+#
+# class ResourcesRosNodelet(Atom):
+#     headers = Headers()
 
 class VariableRosNodelet(Dictionary):
     header = None
@@ -72,6 +93,25 @@ class VariableRosNodelet(Dictionary):
     cmake = None
 
 
+class PackageStructure(Logger):
+    def __init__(self, name, package):
+        super().__init__(name)
+        self.name = name
+        self.package = package
+
+        self.Cpp = D(# Interface
+                     Interface=CppHandler(f'Interface{self.name}', self.package, 'Interface'),
+                     # Generated
+                     Generated = CppHandler(f'Generated{self.name}', self.package, 'Generated'),
+                     # generated User
+                     User = CppHandler(f'{self.name}', self.package))
+
+    def initialize(self):
+        self.LogInfo('Initializing Package Structure')
+        for name, cppHandler in self.Cpp():
+            self.Log(f'Init Cpp Handler {name}')
+            cppHandler.init()
+
 '''
     Interface
 '''
@@ -79,9 +119,11 @@ class VariableRosNodelet(Dictionary):
 class InterfaceRosNodeletComponet(VariableRosNodelet, Dir, Mouvable):
     def __init__(self, content=None):
         super().__init__(content ['name'])
+        self.name = content ['name']
         self.package = content['package']
         self.data = content
-        self.resources = ResourcesRosNodelet()
+        self.interface = Interface()
+        self.package_structure = PackageStructure(self.name, self.package)
 
     def go_to_package(self):
         # TO-DO find roscd package
@@ -91,15 +133,17 @@ class InterfaceRosNodeletComponet(VariableRosNodelet, Dir, Mouvable):
             self.go(pkg)
 
 
+    def create_structure(self):
+        self.LogInfo('Initializing component')
+        self.package_structure.initialize()
+        # Interface
+        # XML
+        # PACKAGE_XML
+        # CMAKE
+
     def _generate_headers(self):
-        includes_dir = path(self.root,'include',self.package,)
-        IComponentHPath = path('Interfaces', 'IComponent.h')
-        GComponentHPath = path('Interfaces', 'GComponent.h')
-
-        self.resources.headers.InterfaceHeader.copy(IComponentHPath)
-        self.resources.headers.GeneratorHeader.copy(GComponentHPath)
-
-
+        # Interface
+        Interface.header.write(self.interface.header.read())
 
 
 
@@ -122,7 +166,10 @@ class RosNodelet(InterfaceRosNodeletComponet):
         pass
 
     def generate(self):
+        # Move to the working directory
         self.go_to_package()
+        # Create the component structure
+        self.create_structure()
         self._generate_headers()
         # TO-DO
         self._cpp()

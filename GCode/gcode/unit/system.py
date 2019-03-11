@@ -1,6 +1,6 @@
 from .logger import Logger
 from gcode.primitive.walker import Walker
-from gcode.primitive.filesystem import module_path, path, write, read, exists, parent_dir
+from gcode.primitive.filesystem import module_path, path, write, read, exists, parent_dir, mkdir
 
 '''
     MOUVABLE

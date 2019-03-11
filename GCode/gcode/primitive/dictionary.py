@@ -57,9 +57,9 @@ class Dictionary(dict):
 
     def __repr__(self):
         to_print = ''
-        incipit = '\n'
+        incipit = ' '
         for key, val in self.__dict__.items():
-            if key !='_class_':
+            if key =='_class__':
                 incipit='\n\t'
             key_ = UseStyle(KEY_STYLE , key)
             val_ = UseStyle(VAL_STYLE , val)

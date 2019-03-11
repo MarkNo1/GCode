@@ -3,16 +3,16 @@ from gcode import BluePrintManager
 
 if __name__ == '__main__':
     # Start the manager in the current path
-    bluem = BluePrintManager()
+    manager = BluePrintManager()
 
     # Find all
-    bluem.find()
+    manager.find()
 
     # Load all
-    bluem.load()
+    manager.load()
 
     # Show BluePrints
-    #bluem.show()
+    #manager.show()
 
     # Generate all
-    bluem.produce()
+    manager.produce()

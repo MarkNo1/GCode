@@ -199,7 +199,7 @@ namespace components {
     /**
      * @brief Virtual. Initialize Algorithm Components
      */
-    virtual void InitComponent() = 0;
+    virtual void InitComponent() final;
 
     /**
     * Generated Topic CallBacks

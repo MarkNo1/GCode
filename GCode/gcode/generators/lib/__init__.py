@@ -1,2 +1,2 @@
-from .xml import Xml
-from .cpp import CppMapping
+from .xml import *
+from .cpp import *

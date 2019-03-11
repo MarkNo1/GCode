@@ -26,50 +26,116 @@
 from gcode.primitive import Dictionary
 from gcode.primitive.time import time
 from gcode.unit.base import Atom
+from gcode.unit.logger import Logger
 
 
-class InterfaceCppMapping(Atom):
-    def incipit(name, brief):
-        return f'/**************************************************************************\n\
-         * \n\
-         *  @file 	 GComponent{name}.h \n\
-         *  @date 	 {time}\n\
-         *  @author 	Generated using GCode (T.M. Akka) \n\
-         *  @brief 	 {brief}\n\
-         *************************************************************************/\n'
+class CppComponent(Atom):
+    pass
 
-    def ifdef(type, classname):
-        return f'#ifndef __{type}_{classname}__\
-                 #define __{type}_{classname}__'
 
-    def include (package, lib) :
-        return f'#include <{package}/{lib}.h>'
+class InterfaceCppMapping(Logger):
 
-    def namespace (name, body) :
-        return f'namespace {name} {{ {body} }};'
 
-    def using (lib, alias=None):
-        return f'using {alias} = {lib};' if alias else f'using {lib};'
+    class Incipit(CppComponent):
+        def __init__(self, name, brief):
+            self.name = name
+            self.brief = brief
 
-    def decl_function (name, return_type='void', args='', body=''):
-         return f'inline {return_type} {name}({args}){{\n {body} \n}}'
+        def __str__(self):
+            return f'/**************************************************************************\n\
+             * \n\
+             *  @file 	 GComponent{self.name}.h \n\
+             *  @date 	 {time}\n\
+             *  @author 	Generated using GCode (T.M. Akka) \n\
+             *  @brief 	 {self.brief}\n\
+             *************************************************************************/\n'
 
-    def call_function (name, args=''):
-        return f'{name}({args});'
 
-    def decl_variable (type, name, init=None ):
-        return  f'{type} {name} = {init};\n' if init else f'{type} {name};\n'
+    class IfDef(CppComponent):
+        def __init__(self, type, classname):
+            self.type = name
+            self.classname = brief
 
-    def If (condition, body, else_body=None):
-        return  f'if ({condition}) {{\n{body}\n}}\nelse{{{body_else}\n}};\n' if else_body \
-                else f'if ({condition}) {{\n{body}\n}}\n;'
+        def __str__(self, type, classname):
+            return f'#ifndef __{self.type}_{self.classname}__\
+                     #define __{self.type}_{self.classname}__'
+
+
+    class Include(CppComponent):
+        def __init__(self, package, lib):
+            self.package = package
+            self.lib = lib
+
+        def __str__(self):
+            return f'#include <{self.package}/{self.lib}.h>'
+
+    class Block(CppComponent):
+        def __init__(self, body):
+            self.body = body
+
+        def __str__(self):
+            return f'{{ \n{self.body}\n }}'
+
+    class Namespace(CppComponent):
+        def __init__(self, name, body):
+            self.name = name
+            self.body = body
+
+        def __str__(self):
+            return f'namespace {self.name} {Block(self.body)};'
+
+    class Using(CppComponent):
+        def __init__(self, lib, alias=None):
+            self.lib=lib
+            self.alias=alias
+
+        def __str__(self):
+            return f'using {self.alias} = {self.lib};' if self.alias else f'using {self.lib};'
+
+    class decl_function(CppComponent):
+        def __init__(self, name, return_type='void', args='', body=''):
+            self.name = name
+            self.return_type = return_type
+            self.args = args
+            self.body = body
+
+        def __str__(self):
+            return f'inline {self.return_type} {self.name}({self.args}) {Block(body)}'
+
+    class call_function(CppComponent):
+        def __init__(self, name, args=''):
+            self.name = name
+            self.args = args
+
+        def __str__(self):
+            return f'{self.name}({self.args});'
+
+    class decl_variable(CppComponent):
+        def __init__(self, type, name, init=None ):
+            self.type = type
+            self.name = name
+            self.init = init
+
+        def __str__(self):
+            return f'{self.type} {self.name} = {self.init};\n' if init else f'{self.type} {self.name};\n'
+
+    class IF(CppComponent):
+        def __init__(self, condition, body, else_body=None):
+            self.condition = condition
+            self.body = body
+            self.else_body = else_body
+
+        def __str__(self):
+            return f'if ({self.condition}) {Block(self.body)} else {Block(self.else_body)};\n' if self.else_body \
+                else f'if ({self.condition}) {Block(body)};'
+
+
+
 
 
 
 class CppMapping(InterfaceCppMapping):
-    def read_BluePrint(self):
-        pass
-
+    pass
 
 
 
