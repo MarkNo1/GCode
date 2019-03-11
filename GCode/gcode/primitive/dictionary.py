@@ -35,7 +35,7 @@ class Dictionary(dict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__dict__ = self
-        self._class_ = str(self.__class__).split('.')[-1].replace("'>", '')
+        self._class__ = str(self.__class__).split('.')[-1].replace("'>", '')
 
     def __getitem__(self, key):
         if key in self:
@@ -48,7 +48,7 @@ class Dictionary(dict):
 
     def __call__(self):
         for key, var in self.__dict__.items():
-            if key !='_class_':
+            if '__' not in key:
                 yield key, var
 
     def __getattr__(self, key):

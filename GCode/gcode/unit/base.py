@@ -23,61 +23,48 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.primitive import fd, exists, mkdir, path
-from gcode.primitive import UseStyle
+
+from gcode.primitive.style import UseStyle
+from gcode.primitive.rapid import New
+from gcode.primitive.time import time, clock
+from gcode.primitive.filesystem import pwd
 from gcode import Dictionary
-from gcode.unit.system import Mouvable
-from gcode.generators import RosNodelet
-import yaml
 
-# BluePrint Variables
-NAME = 'name'
-PATH = 'path'
-CONTENT = 'content'
-GENERATED = 'generated'
-COMPONENT = 'component'
-
-# Componet Variable
-PKG = 'package'
-MODE = 'mode'
-BRIEF = 'brief'
-PARAMS = 'params'
-# Params
-TYPE = 'type'
-TOPICS = 'topics'
-# Topics
-MSG = 'msg'
+'''
+@ ATOM
+'''
 
 
-# Style
-s_class = 610
-s_componentname = 708
-green = 6770
-white = 6277
+# Styles
 
-class BluePrintBase(Mouvable):
-    def __init__(self, name, path):
-        super().__init__(name)
-        self.go(path)
-        self[ CONTENT ] = None
-        self[ GENERATED ] = Dictionary()
-        self[ COMPONENT ] = None
-        self.Log('Created.', True)
+blue = 610
+lightblue = 6420
 
-    def _create_component(self):
-        if self.content.mode == 'RosNodelet':
-            self.component = RosNodelet(self.content)
+
+'''
+    INTERFACE ATOM
+'''
+class InterfaceAtom(Dictionary):
+    def __init__(self, name=''):
+        super().__init__()
+        self.__target__ = self.__add_target(name)
+        self.__style__ = Dictionary(clas=blue,target=lightblue)
+
+    def __add_target(self, specialization):
+        if specialization:
+            if '.' in specialization:
+                specialization = specialization.split('.')[0]
+        return specialization
+
+    def use_style(self, style, text):
+        return UseStyle(style, text)
 
 
 
-class BluePrint(BluePrintBase):
-
-    def load(self):
-        self.content = Dictionary(yaml.load(fd(self.root)))
-        self.Log('Configuration Loaded.', True)
-
-    def produce(self):
-        self.Log('Producing Component')
-        # Create the suited component
-        self._create_component()
-        self.component.generate()
+'''
+    ATOM
+'''
+class Atom(InterfaceAtom):
+    license = license
+    root = pwd()
+    born = time()

@@ -2,25 +2,28 @@
 
 verbose = '''
 
-    Clean Python cache 0.3
+    Clean Python cache 0.4
 
 '''
-
 
 __name__ == "__main__"
 
 from gcode.primitive import rm
-from gcode.unit.Atoms import Mapper
-
-
-cleaner = Mapper()
+from gcode.unit.system import Mapper
 
 
 DIR_TARGET = ['__pycache__', '.egg-info',]
 
 
-for pdir, dir in cleaner.dirs:
-    for DIR in DIR_TARGET:
-        if DIR in dir:
-            rm(pdir)
-            cleaner.Log(f'Deleted {pdir}', True)
+class Cleaner(Mapper):
+    def clean(self):
+        for pdir, dir in self.dirs:
+            for DIR in DIR_TARGET:
+                if DIR in dir:
+                    rm(pdir)
+                    self.Log(f'Deleted {pdir}', True)
+
+
+c = Cleaner()
+
+c.clean()

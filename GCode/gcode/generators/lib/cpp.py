@@ -25,7 +25,7 @@
 
 from gcode.primitive import Dictionary
 from gcode.primitive.time import time
-from gcode.unit.Atoms import Atom
+from gcode.unit.base import Atom
 
 
 class InterfaceCppMapping(Atom):

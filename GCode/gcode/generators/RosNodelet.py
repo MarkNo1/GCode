@@ -24,15 +24,14 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from gcode import Dictionary
-from gcode.unit.Atoms import Atom, Logger, File, List
+from gcode.unit.base import Atom
+from gcode.unit.logger import  Logger
+from gcode.unit.system import  File, Dir, Mouvable
 from gcode.primitive.filesystem import module_path, path, read, exists
 import gcode
 
-SUPPORTED_MODE = ['RosNodelet']
-
-
 '''
-    Component
+    Ros Nodelet Component
 '''
 
 green = 6770
@@ -40,15 +39,10 @@ white = 6277
 
 DATA = 'data'
 
+# Path to resources
 MODULE_PATH = module_path(gcode)
-
+# Generate relative path
 relative_path = lambda file :  f'{MODULE_PATH}/resources/{file}'
-
-
-'''
-    Ros Nodelet Component
-____________________
-'''
 
 
 '''
@@ -57,22 +51,20 @@ ____________________
 white = 6277
 
 
-class ResourcesRosNodelet(Logger):
-    headers = List('Headers', File('IComponentHeader', relative_path('IComponentv1.h')))
 
-    def load_resource(self):
-        self.Log('Reading resources', white)
-        for file in self.headers():
-            self[file.name] = file.read()
+class Headers(Atom):
+    InterfaceHeader =  File('IComponentH', relative_path('IComponentv1.h'))
+    GeneratorHeader =  File('GComponentH', relative_path('GComponentv1.h'))
+
+class ResourcesRosNodelet(Atom):
+    headers = Headers()
 
 
 '''
     Variable
 '''
 
-
 class VariableRosNodelet(Dictionary):
-    mode = None
     header = None
     cpp = None
     xml = None
@@ -84,23 +76,38 @@ class VariableRosNodelet(Dictionary):
     Interface
 '''
 
-
-class InterfaceRosNodeletComponet(ResourcesRosNodelet, VariableRosNodelet):
+class InterfaceRosNodeletComponet(VariableRosNodelet, Dir, Mouvable):
     def __init__(self, content=None):
         super().__init__(content ['name'])
+        self.package = content['package']
         self.data = content
-        self.load_resource()
+        self.resources = ResourcesRosNodelet()
+
+    def go_to_package(self):
+        # TO-DO find roscd package
+        pkg = path(self.root, self.package)
+        if not exists(pkg):
+            self.make_dir(pkg)
+            self.go(pkg)
+
+
+    def _generate_headers(self):
+        includes_dir = path(self.root,'include',self.package,)
+        IComponentHPath = path('Interfaces', 'IComponent.h')
+        GComponentHPath = path('Interfaces', 'GComponent.h')
+
+        self.resources.headers.InterfaceHeader.copy(IComponentHPath)
+        self.resources.headers.GeneratorHeader.copy(GComponentHPath)
+
+
+
 
 
 '''
     RosNodelet
 '''
 
-
 class RosNodelet(InterfaceRosNodeletComponet):
-
-    def _header(self):
-        pass
 
     def _cpp(self):
         pass
@@ -115,8 +122,9 @@ class RosNodelet(InterfaceRosNodeletComponet):
         pass
 
     def generate(self):
-        # Load Preset
-        self._header()
+        self.go_to_package()
+        self._generate_headers()
+        # TO-DO
         self._cpp()
         self._xml()
         self._packagexml()

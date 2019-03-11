@@ -42,7 +42,7 @@ namespace generated {
     * Generated Topic CallBacks to store the msg in a queue
     *
     */
-    void CallbackName(const ros::MsgConstPtr & msg);
+    @Callbacks;
 
 
     /**
@@ -52,35 +52,12 @@ namespace generated {
      */
     virtual void InitComponent() = 0;
 
-
   protected:
-
-
-    /**
-    *
-    * Get latest unprocessed msg from Data
-    *
-    **/
-    MsgConstPrt& GetMsg();
-
 
     // Ros Topic
     @RosTopics
 
     // Ros Parameters
     @RosParams
-
-  private:
-
-    /*
-    * Add the received msg to the queue
-    */
-    void AddReceivedMsg(const MsgConstPtr& msg);
-
-
-    // Data Received
-    queue<MsgConstPtr> data_;
-    // Data mutex
-    mutex data_mutex; // To-Do
 
   };

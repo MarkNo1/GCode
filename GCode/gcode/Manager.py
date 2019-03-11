@@ -25,15 +25,14 @@
 '''
 
 from gcode.primitive import exts, basename
-from gcode.primitive.walker import Walker
-from gcode.unit.Atoms import Mapper
+from gcode.unit.system import Mapper
 from gcode.blueprints import BluePrint
 
 
 COMPONENT = '.Component'
 FLOW = '.Flow'
 
-white = 6277
+
 
 # Manager
 class BluePrintManager(Mapper):
@@ -41,18 +40,18 @@ class BluePrintManager(Mapper):
     blueprints = []
 
     def find(self):
-        self.Log('Searching for BluePrints', white)
+        self.LogInfo('Searching for BluePrints')
         for path, file in self['files']:
                 self.__add(file, path)
 
 
     def load(self):
-        self.Log('Loading BluePrint', white)
+        self.LogInfo('Loading BluePrint')
         for blueprint in self.blueprints:
             blueprint.load()
 
     def produce(self):
-        self.Log('Producing BluePrint', white)
+        self.LogInfo('Producing BluePrint')
         for blueprint in self.blueprints:
             blueprint.produce()
 
