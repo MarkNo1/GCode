@@ -49,19 +49,21 @@ relative_path = lambda file :  f'{MODULE_PATH}/resources/{file}'
     Resources
 '''
 class CppHandler(Atom):
-    def __init__(self, name, package, folder=None):
+    def __init__(self, name, package, folder=None, source=None):
         super().__init__(name)
         self.name = name
         self.package = package
-        # Folders path
+        self.use_source = source
+        # Header
         self.headers_path = self.__header_path(folder)
-        self.sources_path = self.__source_path(folder)
         header_name = f'{self.name}.h'
-        source_name = f'{self.name}.cc'
-        # Header file
         self.header = File(f'{self.name}Header', path(self.headers_path, header_name))
-        # Source file
-        self.source = File(f'{self.name}Source', path(self.sources_path, source_name ))
+
+        if source:
+            self.sources_path = self.__source_path(folder)
+            source_name = f'{self.name}.cc'
+            self.source = File(f'{self.name}Source', path(self.sources_path, source_name ))
+
 
     def __header_path(self, folder):
         root = path(self.package, 'include', self.package)
@@ -77,7 +79,8 @@ class CppHandler(Atom):
 
     def init(self):
         self.header.write('')
-        self.source.write('')
+        if self.use_source:
+            self.source.write('')
 
 class Interface(Atom):
     header =  File('IComponentH', relative_path('IComponentv1.h'))
@@ -102,9 +105,9 @@ class PackageStructure(Logger):
         self.Cpp = D(# Interface
                      Interface=CppHandler(f'Interface{self.name}', self.package, 'Interface'),
                      # Generated
-                     Generated = CppHandler(f'Generated{self.name}', self.package, 'Generated'),
+                     Generated = CppHandler(f'Generated{self.name}', self.package, 'Generated', source=True),
                      # generated User
-                     User = CppHandler(f'{self.name}', self.package))
+                     User = CppHandler(f'{self.name}', self.package, source=True))
 
     def initialize(self):
         self.LogInfo('Initializing Package Structure')

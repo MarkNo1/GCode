@@ -22,3 +22,9 @@ class List(Atom):
 
     def __len__(self):
         return len(data)
+
+    def __str__(self):
+        text = ''
+        for line in self.data:
+            text += f'{line}\n'
+        return text

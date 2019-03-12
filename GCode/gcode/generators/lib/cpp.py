@@ -27,110 +27,186 @@ from gcode.primitive import Dictionary
 from gcode.primitive.time import time
 from gcode.unit.base import Atom
 from gcode.unit.logger import Logger
+from gcode.unit.list import List
 
 
 class CppComponent(Atom):
-    pass
+    def __init__(self):
+        super().__init__()
 
 
-class InterfaceCppMapping(Logger):
 
 
-    class Incipit(CppComponent):
-        def __init__(self, name, brief):
-            self.name = name
-            self.brief = brief
+class Incipit(CppComponent):
+    def __init__(self, name, brief):
+        super().__init__()
+        self.name = name
+        self.brief = brief
 
-        def __str__(self):
-            return f'/**************************************************************************\n\
+    def __str__(self):
+        return f'/**************************************************************************\n\
              * \n\
-             *  @file 	 GComponent{self.name}.h \n\
-             *  @date 	 {time}\n\
-             *  @author 	Generated using GCode (T.M. Akka) \n\
+             *  @file 	 {self.name}.h \n\
+             *  @date 	 {time()}\n\
+             *  @author Generated using GCode (T.M. Akka) \n\
              *  @brief 	 {self.brief}\n\
              *************************************************************************/\n'
 
 
-    class IfDef(CppComponent):
-        def __init__(self, type, classname):
-            self.type = name
-            self.classname = brief
+class IfDef(CppComponent):
+    def __init__(self, type, classname):
+        super().__init__()
+        self.type = type
+        self.classname = classname
 
-        def __str__(self, type, classname):
-            return f'#ifndef __{self.type}_{self.classname}__\
-                     #define __{self.type}_{self.classname}__'
+    def __str__(self):
+        return f'#ifndef __{self.type}_{self.classname}__\
+                 \n#define __{self.type}_{self.classname}__'
 
 
-    class Include(CppComponent):
-        def __init__(self, package, lib):
-            self.package = package
-            self.lib = lib
+class Include(CppComponent):
+    def __init__(self, package, lib):
+        super().__init__()
+        self.package = package
+        self.lib = lib
 
-        def __str__(self):
-            return f'#include <{self.package}/{self.lib}.h>'
-
-    class Block(CppComponent):
-        def __init__(self, body):
-            self.body = body
-
-        def __str__(self):
-            return f'{{ \n{self.body}\n }}'
-
-    class Namespace(CppComponent):
-        def __init__(self, name, body):
-            self.name = name
-            self.body = body
-
-        def __str__(self):
-            return f'namespace {self.name} {Block(self.body)};'
-
-    class Using(CppComponent):
-        def __init__(self, lib, alias=None):
-            self.lib=lib
-            self.alias=alias
-
-        def __str__(self):
-            return f'using {self.alias} = {self.lib};' if self.alias else f'using {self.lib};'
-
-    class decl_function(CppComponent):
-        def __init__(self, name, return_type='void', args='', body=''):
-            self.name = name
-            self.return_type = return_type
-            self.args = args
-            self.body = body
-
-        def __str__(self):
-            return f'inline {self.return_type} {self.name}({self.args}) {Block(body)}'
-
-    class call_function(CppComponent):
-        def __init__(self, name, args=''):
-            self.name = name
-            self.args = args
-
-        def __str__(self):
-            return f'{self.name}({self.args});'
-
-    class decl_variable(CppComponent):
-        def __init__(self, type, name, init=None ):
-            self.type = type
-            self.name = name
-            self.init = init
-
-        def __str__(self):
-            return f'{self.type} {self.name} = {self.init};\n' if init else f'{self.type} {self.name};\n'
-
-    class IF(CppComponent):
-        def __init__(self, condition, body, else_body=None):
-            self.condition = condition
-            self.body = body
-            self.else_body = else_body
-
-        def __str__(self):
-            return f'if ({self.condition}) {Block(self.body)} else {Block(self.else_body)};\n' if self.else_body \
-                else f'if ({self.condition}) {Block(body)};'
+    def __str__(self):
+        return f'#include <{self.package}/{self.lib}.h>'
 
 
 
+        # def __str__(self):
+        #     return super().__str__() + '\n};\n'
+
+class Namespace(CppComponent):
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+        self.body_block = Block()
+
+    def add(self, element):
+        self.body_block.add(element)
+        return self
+
+    def __str__(self):
+        return f'namespace {self.name} {self.body_block}'
+
+
+class Class(CppComponent):
+    def __init__(self, name, inheritance):
+        super().__init__()
+        self.name = name
+        self.inheritance = inheritance
+        self.body_block = Block()
+
+    def add(self, element):
+        self.body_block.add(element)
+        return self
+
+    def __str__(self):
+        return f'class {self.name} : public {self.inheritance} \n {self.body_block}'
+
+
+class Using(CppComponent):
+    def __init__(self, lib, alias=None):
+        super().__init__()
+        self.lib=lib
+        self.alias=alias
+
+    def __str__(self):
+        return f'using {self.alias} = {self.lib};' if self.alias else f'using {self.lib};'
+
+class DeclareFunction(CppComponent):
+    def __init__(self, name, return_type='void', args='', body='', pre='', post=''):
+        super().__init__()
+        self.name = name
+        self.return_type = return_type
+        self.args = args
+        self.body = Block()
+        self.pre = pre
+        self.post = post
+
+    def __str__(self):
+        to_return = ''
+        if self.pre:
+            to_return += f'{self.pre}'
+        to_return = f'{self.return_type} {self.name}({self.args})'
+        if self.post:
+            to_return += f'{self.post}'
+        if self.block:
+            to_return += f'{self.body}'
+        return to_return + ';'
+
+
+class Decl_Variable(CppComponent):
+    def __init__(self, type, name, init=None):
+        super().__init__()
+        self.type = type
+        self.name = name
+        self.init = init
+
+    def __str__(self):
+        return f'{self.type} {self.name} = {self.init};' if self.init else  f'{self.type} {self.name};'
+
+class Call_function(CppComponent):
+    def __init__(self, name, args=''):
+        super().__init__()
+        self.name = name
+        self.args = args
+
+    def __str__(self):
+        return f'{self.name}({self.args});'
+
+class Decl_variable(CppComponent):
+    def __init__(self, type, name, init=None ):
+        super().__init__()
+        self.type = type
+        self.name = name
+        self.init = init
+
+    def __str__(self):
+        return f'{self.type} {self.name} = {self.init};\n' if init else f'{self.type} {self.name};\n'
+
+class IF(CppComponent):
+    def __init__(self, condition, body, else_body=None):
+        super().__init__()
+        self.condition = condition
+        self.body = body
+        self.else_body = else_body
+
+    def __str__(self):
+        return f'if ({self.condition}) {Block(self.body)} else {Block(self.else_body)};\n' if self.else_body \
+                else f'if ({self.condition}) {Block(self.body)};'
+
+
+
+
+class Code(List):
+    pass
+
+
+class Block(List):
+    def __init__(self):
+        super().__init__('Body')
+        self.data = []
+        self.add('{\n')
+
+    def __str__(self):
+        if '}' not in self.data[-1]:
+            self.add('\n};\n')
+        return super().__str__()
+
+
+class InterfaceCppMapping(Logger):
+    def __init__(self, name):
+        super().__init__(name)
+        self.code = Code()
+
+    def add(self, element):
+        self.code.add(element)
+
+    def get_last(self):
+        return self.code[-1]
 
 
 
@@ -166,13 +242,41 @@ class Cpp_old:
 
 # TESTING
 if __name__ == '__main__':
-    data = [
-        {'Incipit'  : ['Alpha','Alpha is the first component generated']},
-        {'Dfunction': ['FunctionTest0','void']},
-        {'Dfunction': ['FunctionTest1','void', 'bool bool_']},
-        {'Dfunction': ['FunctionTest2','int', 'std::string number', 'return std::stoi(number)']},
-    ]
 
-    cpp = Cpp(data)
+    cpp = CppMapping
 
-    print(cpp.cpp)
+    GCName = 'GTest'
+    ICName = 'IComponent'
+
+    MSG='std_msg::bool'
+
+    GCH = CppMapping('GeneratedComponentHeader')
+    # Incipit
+    GCH.add(Incipit(GCName, 'First attempt generate code.'))
+    # IfDef
+    GCH.add(IfDef('Generated', GCName))
+    # Using
+    GCH.add(Using('future::IComponent'))
+    # NameSpace
+    GCH.add(
+            Namespace('generated').add(
+                Class(GCName, ICName).add(
+                    Using('IComponent::IComponent')
+                    ).add('public:'
+                    ).add(DeclareFunction('Parameters', pre='virtual', post='final')
+                    ).add(DeclareFunction('Topic', pre='virtual', post='final')
+                    ).add(DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg')
+                    ).add(DeclareFunction('Initialize', pre='virtual', post='= 0')
+                    ).add('private:'
+                    )
+                )
+            )
+
+    C = Class(GCName, ICName)
+    for i in range(10):
+        C.add('Test'+ str(i))
+
+
+    print(GCH.code)
+
+    print(C)
