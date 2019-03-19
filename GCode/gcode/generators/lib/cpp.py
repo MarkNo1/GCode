@@ -35,6 +35,90 @@ class CppComponent(Atom):
         super().__init__()
 
 
+class Delimiter(Atom):
+    def __init__(self, start: str = '{', end: str='}'):
+        super().__init__()
+        self.start = start
+        self.end = end
+
+
+
+class Block(List):
+    def __init__(self, delimiter:Delimiter = Delimiter()):
+        super().__init__('Body')
+        self.data = []
+        self.delimiter = delimiter
+        self.add(f'{self.delimiter.start}\n')
+
+    def __str__(self):
+        if self.delimiter.end:
+            if self.delimiter.end not in self.data[-1]:
+                self.add(self.delimiter.end)
+        return super().__str__()
+
+
+class ClassGender(Block):
+    def __init__(self, type:str = 'public'):
+        super().__init__(delimiter=Delimiter(start=':', end=None))
+        self.type = type
+
+    def add(self, val):
+        self.data.append(f'\t{val}')
+        return self
+
+    def __str__(self):
+        return f'{self.type}{super().__str__()}'
+
+
+class Public(ClassGender):
+    pass
+
+
+class Protected(ClassGender):
+    def __init__(self):
+        super().__init__('protected')
+
+
+class Private(ClassGender):
+    def __init__(self):
+        super().__init__('private')
+
+
+# Class Enum
+PUBLIC = 3
+PROTECTED = 4
+PRIVATE = 5
+
+class Class(Block):
+    def __init__(self, name, inheritance=''):
+        super().__init__()
+        self.name = name
+        self.inheritance = inheritance
+        self.add(Public())
+        self.public = self.__len__()
+        self.add(Protected())
+        self.add(Private())
+
+    def add_public(self, val):
+        print(self.data[PUBLIC])
+        self.data[PUBLIC].add(val)
+        return self
+
+    def add_protected(self, val):
+        self.data[PROTECTED].add(val)
+        return self
+
+    def add_private(self, val):
+        self.data[PRIVATE].add(val)
+        return self
+
+    def __str__(self):
+        class_ = f'class {self.name} '
+        if self.inheritance:
+            class_ += f'public: {self.inheritance}'
+
+        return f'{class_} {super().__str__()}'
+
 
 
 class Incipit(CppComponent):
@@ -75,9 +159,6 @@ class Include(CppComponent):
 
 
 
-        # def __str__(self):
-        #     return super().__str__() + '\n};\n'
-
 class Namespace(CppComponent):
     def __init__(self, name):
         super().__init__()
@@ -91,20 +172,6 @@ class Namespace(CppComponent):
     def __str__(self):
         return f'namespace {self.name} {self.body_block}'
 
-
-class Class(CppComponent):
-    def __init__(self, name, inheritance):
-        super().__init__()
-        self.name = name
-        self.inheritance = inheritance
-        self.body_block = Block()
-
-    def add(self, element):
-        self.body_block.add(element)
-        return self
-
-    def __str__(self):
-        return f'class {self.name} : public {self.inheritance} \n {self.body_block}'
 
 
 class Using(CppComponent):
@@ -185,17 +252,6 @@ class Code(List):
     pass
 
 
-class Block(List):
-    def __init__(self):
-        super().__init__('Body')
-        self.data = []
-        self.add('{\n')
-
-    def __str__(self):
-        if '}' not in self.data[-1]:
-            self.add('\n};\n')
-        return super().__str__()
-
 
 class InterfaceCppMapping(Logger):
     def __init__(self, name):
@@ -260,14 +316,14 @@ if __name__ == '__main__':
     # NameSpace
     GCH.add(
             Namespace('generated').add(
-                Class(GCName, ICName).add(
+                Class(GCName, ICName).add_public(
                     Using('IComponent::IComponent')
-                    ).add('public:'
-                    ).add(DeclareFunction('Parameters', pre='virtual', post='final')
-                    ).add(DeclareFunction('Topic', pre='virtual', post='final')
-                    ).add(DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg')
-                    ).add(DeclareFunction('Initialize', pre='virtual', post='= 0')
-                    ).add('private:'
+                    ).add_public('public:'
+                    ).add_public(DeclareFunction('Parameters', pre='virtual', post='final')
+                    ).add_public(DeclareFunction('Topic', pre='virtual', post='final')
+                    ).add_public(DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg')
+                    ).add_public(DeclareFunction('Initialize', pre='virtual', post='= 0')
+                    ).add_public('private:'
                     )
                 )
             )

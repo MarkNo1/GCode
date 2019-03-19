@@ -39,11 +39,14 @@ class BluePrintManager(Mapper):
 
     blueprints = []
 
+    def __add(self, file, path):
+        if COMPONENT in file or FLOW in file:
+            self.blueprints.append(BluePrint(file, path))
+
     def find(self):
         self.LogInfo('Searching for BluePrints')
         for path, file in self['files']:
                 self.__add(file, path)
-
 
     def load(self):
         self.LogInfo('Loading BluePrint')
@@ -54,10 +57,6 @@ class BluePrintManager(Mapper):
         self.LogInfo('Producing BluePrint')
         for blueprint in self.blueprints:
             blueprint.produce()
-
-    def __add(self, file, path):
-        if COMPONENT in file or FLOW in file:
-            self.blueprints.append(BluePrint(file, path))
 
     def show(self):
         self.Log(f'Current BluePrints: {len(self.blueprints)}\n{self.blueprints}')

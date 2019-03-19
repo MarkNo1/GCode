@@ -17,6 +17,7 @@ DIR_TARGET = ['__pycache__', '.egg-info',]
 
 class Cleaner(Mapper):
     def clean(self):
+        print(verbose)
         for pdir, dir in self.dirs:
             for DIR in DIR_TARGET:
                 if DIR in dir:

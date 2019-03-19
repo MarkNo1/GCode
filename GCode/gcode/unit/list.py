@@ -21,10 +21,10 @@ class List(Atom):
         return self
 
     def __len__(self):
-        return len(data)
+        return len(self.data)
 
     def __str__(self):
         text = ''
         for line in self.data:
-            text += f'{line}\n'
+            text += f'{line} '
         return text
