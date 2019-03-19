@@ -41,9 +41,9 @@ red = 11023
 class InterfaceLogger(Atom):
 
     def __intro(self):
-        c = self.use_style(self.__style__.clas, self._class__)
-        t =  self.use_style(self.__style__.target, self.__target__)
-        return f"{clock()}: {c}.{t}" if self.__target__ else f'{clock()}  {c}'
+        c = self.use_style(self.__style__.c, self._class__)
+        t =  self.use_style(self.__style__.t, self.__target__)
+        return f"{clock()}: {c}.{t}" if self.__target__ else f'{clock()}: {c}'
 
     def _info(self, text):
         return self.use_style(white, text)

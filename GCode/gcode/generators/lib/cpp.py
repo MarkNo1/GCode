@@ -205,16 +205,6 @@ class DeclareFunction(CppComponent):
         return to_return + ';'
 
 
-class Decl_Variable(CppComponent):
-    def __init__(self, type, name, init=None):
-        super().__init__()
-        self.type = type
-        self.name = name
-        self.init = init
-
-    def __str__(self):
-        return f'{self.type} {self.name} = {self.init};' if self.init else  f'{self.type} {self.name};'
-
 class Call_function(CppComponent):
     def __init__(self, name, args=''):
         super().__init__()

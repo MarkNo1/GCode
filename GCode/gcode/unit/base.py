@@ -48,7 +48,7 @@ class InterfaceAtom(Dictionary):
     def __init__(self, name=''):
         super().__init__()
         self.__target__ = self.__add_target(name)
-        self.__style__ = Dictionary(clas=blue,target=lightblue)
+        self.__style__ = Dictionary(c=blue,t=lightblue)
 
     def __add_target(self, specialization):
         if specialization:
