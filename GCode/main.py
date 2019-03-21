@@ -13,9 +13,9 @@ if __name__ == '__main__':
     manager.load()
 
 
-    # Define Component
+    # Define Producer
     manager.define()
 
 
     # Generate all
-    manager.produce()
+    manager.generate()

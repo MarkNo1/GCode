@@ -60,11 +60,7 @@ class File(Dir):
         return self.root.split('/')[-1]
 
     def copy(self, path):
-        backup_path = self.root
-        content = self.read()
-        self.root = path
-        self.write(content)
-        self.root = backup_path
+        self.write(read(path))
 
 
 

@@ -25,17 +25,24 @@
 
 from gcode.unit.base import Atom
 from gcode.generators.Package import Package
-from gcode.generators.Cpp.handler import Handler
+from gcode.generators.Cpp.handler import CppHandler
 from gcode.generators.Nodelet.Cpp import GetInterface, GetInternal, GetUser
+from gcode.primitive import path, exists
+
+TemporaryPkgPath = '/home/marco/Desktop/Generated'
 
 class INodelet(Package):
     def __init__(self, blueprint):
         super().__init__(blueprint.name, blueprint.package)
+        self.LogSucces('Created.')
         self.blueprint = blueprint
         self.__init_root()
 
+
+
     def __init_root(self):
         # TO-DO find roscd package
+        self.go(TemporaryPkgPath)
         pkg = path(self.root, self.package)
         if not exists(pkg):
             self.make_dir(pkg)
@@ -43,12 +50,16 @@ class INodelet(Package):
 
 
 
+
 class Nodelet(INodelet):
+    def __init__(self, blueprint):
+        super().__init__(blueprint)
+        self.cpp()
 
     def cpp(self):
         # Interface
-        self.add_handler(GetInterface(blueprint))
+        self.add_handler(GetInterface(self.root, self.blueprint))
         # Internal
-        self.add_handler(GetInternal(blueprint))
+        self.add_handler(GetInternal(self.root, self.blueprint))
         # User
-        self.add_handler(GetUser(blueprint))
+        self.add_handler(GetUser(self.root, self.blueprint))

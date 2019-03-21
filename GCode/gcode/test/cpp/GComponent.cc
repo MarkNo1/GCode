@@ -1,48 +1,33 @@
 /*****************************************************************************/
 /*!
- *  @file 	 GComponent{Name}.h
+ *  @file 	 GComponent{Name}.cc
  *  @date 	 2019.02.02
  *  @author  Generated using GCode (M. Treglia Akka)
  *  @brief 	 Generated ComponentName
  *****************************************************************************/
 
-#ifndef __GENERATED_@ComponentName__
-#define __GENERATED_@ComponentName__
+#include <@PKG/Interal/@Name>
 
-#include <ros/ros.h>
-#include <renault_components/IComponent.h>
+using generate::@Name;
 
-using future::IComponent;
-
-
-namespace generated {
-
-  /**
-   *  @class  GComponentName
-   *  @brief  Generated ComponentName skeletons.
-   */
-
-  class G@ComponentName : public IComponent {
-   public:
-     using IComponent::IComponent;
 
     /**
      * @brief Virtual. Loading Ros Parameters
      */
-    virtual void Parameters() final;
+    virtual void @Name::Parameters() {};
 
 
     /**
      * @brief Virtual. Open Ros topic communications. (Publishers, Subscribers)
      */
-    virtual void Topic() final;
+    virtual void @Name::Topic() {};
 
     /**
     *
     * Generated Topic CallBacks to store the msg in a queue
     *
     */
-    void CallbackName(const ros::MsgConstPtr & msg);
+    void @Name::CallbackName(const ros::MsgConstPtr & msg);
 
 
     /**
@@ -50,11 +35,9 @@ namespace generated {
      *        This is not yet implemented. You have to override it
      *        in the next phase
      */
-    virtual void InitComponent() = 0;
+    virtual void @Name::InitComponent() = 0;
 
-
-  private:
-
+private:
     // Ros Topic
     @RosTopics
 

@@ -24,49 +24,48 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from .definition import *
-from gcode.unit.logger import Logger
-from gcode.unit.system import File
+from gcode.unit.system import File, Mouvable
 from gcode.primitive.filesystem import path
 from gcode.generators.Cpp.definition import CppContent
 
 
 class Hpp(CppContent):
-    def __init__(self, filename:str, classname:str, description:str=''):
+    def __init__(self, classname:str, description:str=''):
+        filename = f'{classname}.h'
         begining = str(Incipit(filename, description))
         begining += str(IFdef('GENERATED', classname.upper())) + '\n'
         super().__init__(Delimiter(start=begining, trimend=';\n'))
 
 
-class IHeader(File):
-    def __init__(self, name, package, custom_folder):
-        super().__init__(name)
+class IHeader(File, Mouvable):
+    def __init__(self, name, package_path, custom_folder):
+        super().__init__(name, 'To be reassinged.')
         self.name = name
-        self.header_name = f'{self.name}.h'
-        self.package = package
+        self.file = f'{self.name}.h'
+        self.package_path = package_path
+        self.package_name = package_path.split('/')[-2]
         self.folder = custom_folder
         self.__init_root__()
 
     def __init_root__(self):
-        root = path(self.package, 'include', self.package)
-        if self.folder != None:
+        root = path(self.package_path, 'include', self.package_name, self.name)
+        if self.folder:
             root = path(root, self.folder)
-        self.root = root
+        self.go(path(root, self.file))
+
 
 
 
 class Header(IHeader):
-    def __init__(self, name, package, custom_folder=None):
-        super().__init__(name, package, custom_folder)
-        self.hpp = None
 
     def initialize(self, classname='', description=''):
-        self.hpp = Hpp(self.header_name, classname, description)
+        self.hpp = Hpp(classname, description)
 
     def produce(self):
-        self.write(self.hpp)
+        self.write(str(self.hpp))
 
     def preview(self):
         self.Log(self.hpp)
 
     def add_corpus(self, corpus:list):
-        self.adds(corpus)
+        self.hpp.adds(corpus)

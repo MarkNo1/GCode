@@ -23,23 +23,26 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.unit.logger import Logger
-from gcode.unit.system import File
+from gcode.unit.system import Mapper, Mouvable, File
 
 from .header import Header
 from .source import Source
 
 
-class Handler(Logger):
-    def __init__(self, name, folder=None, package=None, source=None):
+class CppHandler(Mapper, Mouvable):
+    def __init__(self, name, package_path, folder=None, source=None):
         super().__init__(name)
-        self.hpp = Header()
-        self.cpp = Source() if source else None
+        self.go(package_path)
+        self.hpp = Header(name, package_path, folder)
+        self.cpp = Source(name, package_path, folder) if source else None
+        self.folder = folder
 
-    def initialize(self):
-        self.hpp.initialize()
+    def initialize(self, classname, description):
+        self.Log('Initializing.')
+        if self.hpp:
+            self.hpp.initialize(classname, description)
         if self.cpp:
-            self.cpp.initialize()
+            self.cpp.initialize(classname, description)
 
     def preview(self):
         self.Log(f'Preview Header')
@@ -53,8 +56,10 @@ class Handler(Logger):
     def source_corpus(self, corpus:list):
         self.cpp.add_corpus(corpus)
 
-    def produce(self):
-        self.Log(f'Producing Header')
-        self.hpp.produce()
-        self.Log(f'Producing Source')
-        self.source.produce()
+    def generate(self):
+        self.Log(f'Generating Header')
+        if self.hpp:
+            self.hpp.produce()
+        self.Log(f'Generating Source')
+        if self.cpp:
+            self.cpp.produce()

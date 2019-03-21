@@ -16,10 +16,6 @@ class List(Atom):
         for var in self.data:
             yield var
 
-    def add(self, val):
-        self.data.append(val)
-        return self
-
     def __len__(self):
         return len(self.data)
 
@@ -28,3 +24,10 @@ class List(Atom):
         for line in self.data:
             text += f'{line} '
         return text
+
+    def add(self, val):
+        self.data.append(val)
+        return self
+
+    def get_last(self):
+        return self.data[-1]

@@ -22,7 +22,7 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+import gcode
 from gcode.unit.list import List
 from gcode.unit.logger import Logger
 from gcode.unit.system import Dir, Mouvable
@@ -40,13 +40,16 @@ class IPackage(List, Dir, Mouvable):
         self.package = package
 
 
+
 class Package(IPackage):
 
     def add_handler(self, handler):
-        handler.package = self.package
-        self.add(handler)
+        self.Log('Adding Handler')
+        if handler:
+            handler.package = self.package
+            self.add(handler)
 
-    def produce(self):
-        for handle in self.data:
-            self.Log(f'Generating: {handle.name}')
-            handle.produce()
+    def generate(self):
+        for handler in self.data:
+            self.Log(f'Generating: {handler.name}')
+            handler.generate()

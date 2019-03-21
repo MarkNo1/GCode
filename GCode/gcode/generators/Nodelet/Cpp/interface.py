@@ -25,10 +25,11 @@
 
 from gcode.generators.Package import resource_path
 from gcode.unit.system import File
-from gcode.generators.Cpp.handler import Handler
+from gcode.generators.Cpp.handler import CppHandler
 
+Type = 'Interface'
 
-def GetInterface(blueprint):
-    interface = Handler(f'Interface{blueprint.name}', 'Interface', source=None)
-    interface.hpp = File('', resource_path('IComponentv1.h')).read()
+def GetInterface(pkg_path, blueprint):
+    interface = CppHandler(f'{Type}{blueprint.name}', pkg_path,  folder = Type, source=None)
+    interface.hpp.copy(resource_path('IComponentv1.h'))
     return interface

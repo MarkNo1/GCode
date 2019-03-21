@@ -354,13 +354,13 @@ if __name__ == '__main__':
 
     print(file)
 
-# Versione 3
-file3 = CppContentOld(GCName, 'Third attempt generate code.')
+    # Versione 3
+    file3 = CppContentOld(GCName, 'Third attempt generate code.')
 
-file_content = [Using('future::IComponent'),
-                NameSpace('generated'),
-                Class(GCName, ICName).adds_public(pub_f).adds_protected(proc_f).adds_private(priv_f)]
+    file_content = [Using('future::IComponent'),
+                    NameSpace('generated'),
+                    Class(GCName, ICName).adds_public(pub_f).adds_protected(proc_f).adds_private(priv_f)]
 
-file3.adds(file_content)
+    file3.adds(file_content)
 
-print(file3)
+    print(file3)

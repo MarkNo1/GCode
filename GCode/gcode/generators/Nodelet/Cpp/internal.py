@@ -22,10 +22,14 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-from gcode.generators.Cpp.handler import Handler
+from gcode.generators.Cpp.handler import CppHandler
 from gcode.generators.Cpp import *
 
-Tag = 'Internal'
+Type = 'Internal'
+
+GCName='C'
+ICName='IC'
+MSG='std_msgs::bool'
 
 pub_functions = [ DeclareFunction('Parameters', pre='virtual', post='final'),
                 DeclareFunction('Topic', pre='virtual', post='final'),
@@ -36,10 +40,14 @@ priv_functions = [DeclareFunction('void', "Test", pre='virtual', args='bool &tes
 prot_functions = [DeclareFunction('void', "Test1", pre='virtual', args='bool &test', post='= 0')]
 header_content = [Using('future::IComponent'),
                 NameSpace('generated'),
-                Class(GCName, ICName).adds_public(pub_f).adds_protected(proc_f).adds_private(priv_f)]
+                Class(GCName, ICName).adds_public(pub_functions).adds_protected(prot_functions).adds_private(priv_functions)]
 
 
 
-def GetInternal(blueprint):
-    internalHandler = Handler(f'{Tag}{blueprint.name}, Tag)
+def GetInternal(package_path, blueprint):
+    componentName = f'{Type}{blueprint.name}'
+    internalHandler = CppHandler(componentName, package_path, folder=Type)
+    internalHandler.initialize(blueprint.name, blueprint.description)
     internalHandler.header_corpus(header_content)
+
+    return internalHandler

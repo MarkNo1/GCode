@@ -27,51 +27,38 @@ from gcode.primitive import fd, exists, mkdir, path
 from gcode.primitive import UseStyle
 from gcode import Dictionary
 from gcode.unit.system import Mouvable
-from gcode.generators import RosNodelet
+from gcode.generators.Nodelet.Nodelet import Nodelet
 import yaml
 
-# BluePrint Variables
-NAME = 'name'
-PATH = 'path'
-CONTENT = 'content'
-GENERATED = 'generated'
-COMPONENT = 'component'
 
-# Componet Variable
-PKG = 'package'
-MODE = 'mode'
-BRIEF = 'brief'
-PARAMS = 'params'
-# Params
-TYPE = 'type'
-TOPICS = 'topics'
-# Topics
-MSG = 'msg'
 
-class BluePrintBase(Mouvable):
+class IBluePrint(Mouvable):
     def __init__(self, name, path):
         super().__init__(name)
         self.go(path)
-        self[ CONTENT ] = None
-        self[ COMPONENT ] = None
+        self.blueprint = None
         self.Log('Created.', True)
 
-    def _create_component(self):
-        if self.content.mode == 'RosNodelet':
-            self.component = RosNodelet(self.content)
+    def create_component(self):
+        if self.blueprint.mode == 'Nodelet':
+            self.component = Nodelet(self.blueprint)
 
 
 
-class BluePrint(BluePrintBase):
+class BluePrint(IBluePrint):
 
     def load(self):
-        self.content = Dictionary(yaml.load(fd(self.root)))
+        self.blueprint = Dictionary(yaml.load(fd(self.root)))
         self.Log('Configuration Loaded.', True)
 
     def define(self):
-        self.Log('Producing Component')
+        self.Log('Creating Component')
         # Create the suited component
-        self._create_component()
+        self.create_component()
 
     def generate(self):
-        self.component.generate()
+        self.Log('Generating Component')
+        if self.component:
+            self.component.generate()
+        else:
+            self.LogError('Format not supported')

@@ -13,6 +13,7 @@
 #    and/or other materials provided with the distribution.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
 # ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
@@ -32,7 +33,7 @@ green = 6770
 orange = 6849
 white = 6277
 red = 11023
-
+debug = 9999
 
 '''
     LOGGER
@@ -57,6 +58,9 @@ class InterfaceLogger(Atom):
     def _error(self, text):
         return self.use_style(red, text)
 
+    def _debug(self, text):
+        return self.use_style(debug, text)
+
     def print(self, text):
         print(f'{self.__intro()} {text}')
 
@@ -73,6 +77,10 @@ class Logger(InterfaceLogger):
 
     def LogError(self, text):
         self.print(self._error(text))
+
+    def LogDB(self, text):
+        self.print(self._debug(text))
+
 
 
     def Log(self, text, status=None):
