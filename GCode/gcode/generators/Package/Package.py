@@ -23,55 +23,30 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.primitive import fd, exists, mkdir, path
-from gcode.primitive import UseStyle
-from gcode import Dictionary
-from gcode.unit.system import Mouvable
-from gcode.generators import RosNodelet
-import yaml
+from gcode.unit.list import List
+from gcode.unit.logger import Logger
+from gcode.unit.system import Dir, Mouvable
+from gcode.primitive.filesystem import module_path, path
 
-# BluePrint Variables
-NAME = 'name'
-PATH = 'path'
-CONTENT = 'content'
-GENERATED = 'generated'
-COMPONENT = 'component'
+# Path to resources
+MODULE_PATH = module_path(gcode)
+# Generate relative path
+resource_path = lambda file :  f'{MODULE_PATH}/resources/{file}'
 
-# Componet Variable
-PKG = 'package'
-MODE = 'mode'
-BRIEF = 'brief'
-PARAMS = 'params'
-# Params
-TYPE = 'type'
-TOPICS = 'topics'
-# Topics
-MSG = 'msg'
 
-class BluePrintBase(Mouvable):
-    def __init__(self, name, path):
+class IPackage(List, Dir, Mouvable):
+    def __init__(self, name, package):
         super().__init__(name)
-        self.go(path)
-        self[ CONTENT ] = None
-        self[ COMPONENT ] = None
-        self.Log('Created.', True)
-
-    def _create_component(self):
-        if self.content.mode == 'RosNodelet':
-            self.component = RosNodelet(self.content)
+        self.package = package
 
 
+class Package(IPackage):
 
-class BluePrint(BluePrintBase):
+    def add_handler(self, handler):
+        handler.package = self.package
+        self.add(handler)
 
-    def load(self):
-        self.content = Dictionary(yaml.load(fd(self.root)))
-        self.Log('Configuration Loaded.', True)
-
-    def define(self):
-        self.Log('Producing Component')
-        # Create the suited component
-        self._create_component()
-
-    def generate(self):
-        self.component.generate()
+    def produce(self):
+        for handle in self.data:
+            self.Log(f'Generating: {handle.name}')
+            handle.produce()

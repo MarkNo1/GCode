@@ -23,55 +23,50 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.primitive import fd, exists, mkdir, path
-from gcode.primitive import UseStyle
-from gcode import Dictionary
-from gcode.unit.system import Mouvable
-from gcode.generators import RosNodelet
-import yaml
+from .definition import *
+from gcode.unit.logger import Logger
+from gcode.unit.system import File
+from gcode.primitive.filesystem import path
+from gcode.generators.Cpp.definition import CppContent
 
-# BluePrint Variables
-NAME = 'name'
-PATH = 'path'
-CONTENT = 'content'
-GENERATED = 'generated'
-COMPONENT = 'component'
 
-# Componet Variable
-PKG = 'package'
-MODE = 'mode'
-BRIEF = 'brief'
-PARAMS = 'params'
-# Params
-TYPE = 'type'
-TOPICS = 'topics'
-# Topics
-MSG = 'msg'
+class Hpp(CppContent):
+    def __init__(self, filename:str, classname:str, description:str=''):
+        begining = str(Incipit(filename, description))
+        begining += str(IFdef('GENERATED', classname.upper())) + '\n'
+        super().__init__(Delimiter(start=begining, trimend=';\n'))
 
-class BluePrintBase(Mouvable):
-    def __init__(self, name, path):
+
+class IHeader(File):
+    def __init__(self, name, package, custom_folder):
         super().__init__(name)
-        self.go(path)
-        self[ CONTENT ] = None
-        self[ COMPONENT ] = None
-        self.Log('Created.', True)
+        self.name = name
+        self.header_name = f'{self.name}.h'
+        self.package = package
+        self.folder = custom_folder
+        self.__init_root__()
 
-    def _create_component(self):
-        if self.content.mode == 'RosNodelet':
-            self.component = RosNodelet(self.content)
+    def __init_root__(self):
+        root = path(self.package, 'include', self.package)
+        if self.folder != None:
+            root = path(root, self.folder)
+        self.root = root
 
 
 
-class BluePrint(BluePrintBase):
+class Header(IHeader):
+    def __init__(self, name, package, custom_folder=None):
+        super().__init__(name, package, custom_folder)
+        self.hpp = None
 
-    def load(self):
-        self.content = Dictionary(yaml.load(fd(self.root)))
-        self.Log('Configuration Loaded.', True)
+    def initialize(self, classname='', description=''):
+        self.hpp = Hpp(self.header_name, classname, description)
 
-    def define(self):
-        self.Log('Producing Component')
-        # Create the suited component
-        self._create_component()
+    def produce(self):
+        self.write(self.hpp)
 
-    def generate(self):
-        self.component.generate()
+    def preview(self):
+        self.Log(self.hpp)
+
+    def add_corpus(self, corpus:list):
+        self.adds(corpus)

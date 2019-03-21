@@ -65,11 +65,20 @@ class BaseBlock(CppBase):
         return f'{self.delimiter.start} {super().__str__()} {self.delimiter.end}'
 
 
-class CppContent(BaseBlock):
+class CppContentOld(BaseBlock):
     def __init__(self, classname:str, description:str=''):
         begining = str(Incipit(classname,description))
         begining += str(IFdef('GENERATED',classname.upper())) + '\n'
         super().__init__(Delimiter(start=begining, trimend=';\n'))
+
+    def adds(self, elements):
+        for element in elements:
+            self = self.add(element)
+
+class CppContent(BaseBlock):
+    def adds(self, elements):
+        for element in elements:
+            self = self.add(element)
 
 
 
@@ -143,7 +152,7 @@ class Comment(BaseBlock):
 class PrettyComment(BaseBlock):
     def __init__(self, n_stars):
         stars = '*' * n_stars
-        start = f'/{stars}'
+        start = f'/{stars}\n'
         end = f'{stars}/'
         super().__init__(delimiter=Delimiter(start=start,
                                              end=end,
@@ -250,12 +259,6 @@ class IF(CurlyBracketBlock):
 
 
 # CLASS
-
-PUBLIC=0
-PRIVATE=1
-PROTECTED=2
-
-
 class Class(CurlyBracketBlock):
     def __init__(self, name:str='', inheritance:str=''):
         incipit = f'class {name} '
@@ -270,22 +273,36 @@ class Class(CurlyBracketBlock):
         self.public = self.public.add(element)
         return self
 
+    def adds_public(self, elements):
+        for element in elements:
+            self.public = self.public.add(element)
+        return self
+
     def add_protected(self, element):
-        self.protected = self.public.add(element)
+        self.protected = self.protected.add(element)
+        return self
+
+    def adds_protected(self, elements):
+        for element in elements:
+            self.protected = self.protected.add(element)
         return self
 
     def add_private(self, element):
-        self.private = self.public.add(element)
+        self.private = self.private.add(element)
         return self
 
+    def adds_private(self, elements):
+        for element in elements:
+            self.private = self.private.add(element)
+        return self
 
     def __str__(self):
         self.data = []
-        if len(self.public) > 1:
+        if len(self.public) > 0:
             self.add(self.public)
-        if len(self.protected) > 1:
+        if len(self.protected) > 0:
             self.add(self.protected)
-        if len(self.private) > 1:
+        if len(self.private) > 0:
             self.add(self.private)
         return super().__str__()
 
@@ -293,24 +310,57 @@ class Class(CurlyBracketBlock):
 # TESTING
 if __name__ == '__main__':
 
-    GCName = 'GTest'
+    GCName = 'GTestClass'
     ICName = 'IComponent'
 
     MSG='std_msg::bool'
 
 
-    file = CppContent(GCName, 'First attempt generate code.')
+    file = CppContentOld(GCName, 'First attempt generate code.')
 
     # Using
     file.add(Using('future::IComponent'))
     # NameSpace
-    file.add(NameSpace('generated').add(
-    Class(GCName, ICName).add_public(Using('IComponent::IComponent'))
-                                        .add_public(DeclareFunction('Parameters', pre='virtual', post='final'))
-                                        .add_public(DeclareFunction('Topic', pre='virtual', post='final'))
-                                        .add_public(DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg'))
-                                        .add_public(DeclareFunction('Initialize', pre='virtual', post='= 0'))
-                                        )
-            )
+    file.add(NameSpace('generated'))
+
+# Version 1
+    # Class(GCName, ICName).add_public(Using('IComponent::IComponent'))
+    #                                     .add_public(DeclareFunction('Parameters', pre='virtual', post='final'))
+    #                                     .add_public(DeclareFunction('Topic', pre='virtual', post='final'))
+    #                                     .add_public(DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg'))
+    #                                     .add_public(DeclareFunction('Initialize', pre='virtual', post='= 0'))
+    #                                     .add_private(DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0'))
+    #                                     .add_protected(DeclareFunction('void', "Test1", pre='virtual', args='bool &test', post='= 0'))
+    #                                     )
+    #         )
+
+# Version 2
+
+    pub_f = [ DeclareFunction('Parameters', pre='virtual', post='final'),
+                DeclareFunction('Topic', pre='virtual', post='final'),
+                DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg'),
+                DeclareFunction('Initialize', pre='virtual', post='= 0'),
+                DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0'),
+    ]
+
+    priv_f = [DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0')]
+
+    proc_f = [DeclareFunction('void', "Test1", pre='virtual', args='bool &test', post='= 0')]
+
+
+    C = Class(GCName, ICName).adds_public(pub_f).adds_protected(proc_f).adds_private(priv_f)
+
+    file.add(C)
 
     print(file)
+
+# Versione 3
+file3 = CppContentOld(GCName, 'Third attempt generate code.')
+
+file_content = [Using('future::IComponent'),
+                NameSpace('generated'),
+                Class(GCName, ICName).adds_public(pub_f).adds_protected(proc_f).adds_private(priv_f)]
+
+file3.adds(file_content)
+
+print(file3)

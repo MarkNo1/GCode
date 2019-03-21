@@ -22,56 +22,24 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+from gcode.generators.Cpp.handler import Handler
+from gcode.generators.Cpp import *
 
-from gcode.primitive import fd, exists, mkdir, path
-from gcode.primitive import UseStyle
-from gcode import Dictionary
-from gcode.unit.system import Mouvable
-from gcode.generators import RosNodelet
-import yaml
+Tag = 'Internal'
 
-# BluePrint Variables
-NAME = 'name'
-PATH = 'path'
-CONTENT = 'content'
-GENERATED = 'generated'
-COMPONENT = 'component'
-
-# Componet Variable
-PKG = 'package'
-MODE = 'mode'
-BRIEF = 'brief'
-PARAMS = 'params'
-# Params
-TYPE = 'type'
-TOPICS = 'topics'
-# Topics
-MSG = 'msg'
-
-class BluePrintBase(Mouvable):
-    def __init__(self, name, path):
-        super().__init__(name)
-        self.go(path)
-        self[ CONTENT ] = None
-        self[ COMPONENT ] = None
-        self.Log('Created.', True)
-
-    def _create_component(self):
-        if self.content.mode == 'RosNodelet':
-            self.component = RosNodelet(self.content)
+pub_functions = [ DeclareFunction('Parameters', pre='virtual', post='final'),
+                DeclareFunction('Topic', pre='virtual', post='final'),
+                DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg'),
+                DeclareFunction('Initialize', pre='virtual', post='= 0'),
+                DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0')]
+priv_functions = [DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0')]
+prot_functions = [DeclareFunction('void', "Test1", pre='virtual', args='bool &test', post='= 0')]
+header_content = [Using('future::IComponent'),
+                NameSpace('generated'),
+                Class(GCName, ICName).adds_public(pub_f).adds_protected(proc_f).adds_private(priv_f)]
 
 
 
-class BluePrint(BluePrintBase):
-
-    def load(self):
-        self.content = Dictionary(yaml.load(fd(self.root)))
-        self.Log('Configuration Loaded.', True)
-
-    def define(self):
-        self.Log('Producing Component')
-        # Create the suited component
-        self._create_component()
-
-    def generate(self):
-        self.component.generate()
+def GetInternal(blueprint):
+    internalHandler = Handler(f'{Tag}{blueprint.name}, Tag)
+    internalHandler.header_corpus(header_content)

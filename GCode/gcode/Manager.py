@@ -53,6 +53,11 @@ class BluePrintManager(Mapper):
         for blueprint in self.blueprints:
             blueprint.load()
 
+    def define(self):
+        self.LogInfo('Defining BluePrint')
+        for blueprint in self.blueprints:
+            blueprint.define()
+
     def produce(self):
         self.LogInfo('Producing BluePrint')
         for blueprint in self.blueprints:

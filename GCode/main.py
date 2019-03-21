@@ -8,11 +8,14 @@ if __name__ == '__main__':
     # Find all
     manager.find()
 
+
     # Load all
     manager.load()
 
-    # Show BluePrints
-    #manager.show()
+
+    # Define Component
+    manager.define()
+
 
     # Generate all
     manager.produce()

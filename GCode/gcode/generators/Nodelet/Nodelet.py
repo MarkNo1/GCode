@@ -23,55 +23,32 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.primitive import fd, exists, mkdir, path
-from gcode.primitive import UseStyle
-from gcode import Dictionary
-from gcode.unit.system import Mouvable
-from gcode.generators import RosNodelet
-import yaml
+from gcode.unit.base import Atom
+from gcode.generators.Package import Package
+from gcode.generators.Cpp.handler import Handler
+from gcode.generators.Nodelet.Cpp import GetInterface, GetInternal, GetUser
 
-# BluePrint Variables
-NAME = 'name'
-PATH = 'path'
-CONTENT = 'content'
-GENERATED = 'generated'
-COMPONENT = 'component'
+class INodelet(Package):
+    def __init__(self, blueprint):
+        super().__init__(blueprint.name, blueprint.package)
+        self.blueprint = blueprint
+        self.__init_root()
 
-# Componet Variable
-PKG = 'package'
-MODE = 'mode'
-BRIEF = 'brief'
-PARAMS = 'params'
-# Params
-TYPE = 'type'
-TOPICS = 'topics'
-# Topics
-MSG = 'msg'
-
-class BluePrintBase(Mouvable):
-    def __init__(self, name, path):
-        super().__init__(name)
-        self.go(path)
-        self[ CONTENT ] = None
-        self[ COMPONENT ] = None
-        self.Log('Created.', True)
-
-    def _create_component(self):
-        if self.content.mode == 'RosNodelet':
-            self.component = RosNodelet(self.content)
+    def __init_root(self):
+        # TO-DO find roscd package
+        pkg = path(self.root, self.package)
+        if not exists(pkg):
+            self.make_dir(pkg)
+            self.go(pkg)
 
 
 
-class BluePrint(BluePrintBase):
+class Nodelet(INodelet):
 
-    def load(self):
-        self.content = Dictionary(yaml.load(fd(self.root)))
-        self.Log('Configuration Loaded.', True)
-
-    def define(self):
-        self.Log('Producing Component')
-        # Create the suited component
-        self._create_component()
-
-    def generate(self):
-        self.component.generate()
+    def cpp(self):
+        # Interface
+        self.add_handler(GetInterface(blueprint))
+        # Internal
+        self.add_handler(GetInternal(blueprint))
+        # User
+        self.add_handler(GetUser(blueprint))

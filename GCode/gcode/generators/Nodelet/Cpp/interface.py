@@ -23,55 +23,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.primitive import fd, exists, mkdir, path
-from gcode.primitive import UseStyle
-from gcode import Dictionary
-from gcode.unit.system import Mouvable
-from gcode.generators import RosNodelet
-import yaml
-
-# BluePrint Variables
-NAME = 'name'
-PATH = 'path'
-CONTENT = 'content'
-GENERATED = 'generated'
-COMPONENT = 'component'
-
-# Componet Variable
-PKG = 'package'
-MODE = 'mode'
-BRIEF = 'brief'
-PARAMS = 'params'
-# Params
-TYPE = 'type'
-TOPICS = 'topics'
-# Topics
-MSG = 'msg'
-
-class BluePrintBase(Mouvable):
-    def __init__(self, name, path):
-        super().__init__(name)
-        self.go(path)
-        self[ CONTENT ] = None
-        self[ COMPONENT ] = None
-        self.Log('Created.', True)
-
-    def _create_component(self):
-        if self.content.mode == 'RosNodelet':
-            self.component = RosNodelet(self.content)
+from gcode.generators.Package import resource_path
+from gcode.unit.system import File
+from gcode.generators.Cpp.handler import Handler
 
 
-
-class BluePrint(BluePrintBase):
-
-    def load(self):
-        self.content = Dictionary(yaml.load(fd(self.root)))
-        self.Log('Configuration Loaded.', True)
-
-    def define(self):
-        self.Log('Producing Component')
-        # Create the suited component
-        self._create_component()
-
-    def generate(self):
-        self.component.generate()
+def GetInterface(blueprint):
+    interface = Handler(f'Interface{blueprint.name}', 'Interface', source=None)
+    interface.hpp = File('', resource_path('IComponentv1.h')).read()
+    return interface
