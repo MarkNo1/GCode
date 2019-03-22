@@ -43,12 +43,12 @@ class IHeader(File, Mouvable):
         self.name = name
         self.file = f'{self.name}.h'
         self.package_path = package_path
-        self.package_name = package_path.split('/')[-2]
+        self.package_name = package_path.split('/')[-1]
         self.folder = custom_folder
         self.__init_root__()
 
     def __init_root__(self):
-        root = path(self.package_path, 'include', self.package_name, self.name)
+        root = path(self.package_path, 'include', self.package_name)
         if self.folder:
             root = path(root, self.folder)
         self.go(path(root, self.file))

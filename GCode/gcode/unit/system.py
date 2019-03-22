@@ -39,11 +39,12 @@ class File(Dir):
 
     def write(self, content):
         self.dir_validator(self.root)
+        self.__exists()
         write(self.root, content)
         if self.exist:
-            self.LogWarn(f'Replace: {self.root}')
+            self.LogWarn(f'Replaced: {self.root}')
         else:
-            self.Log(f'Created: {self.root}', True)
+            self.Log(f'Writed: {self.root}', True)
 
     def read(self):
         if not self.exist:
@@ -62,6 +63,8 @@ class File(Dir):
     def copy(self, path):
         self.write(read(path))
 
+    def __str__(self):
+        return self.read()
 
 
 '''

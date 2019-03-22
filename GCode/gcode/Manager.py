@@ -44,22 +44,22 @@ class BluePrintManager(Mapper):
             self.blueprints.append(BluePrint(file, path))
 
     def find(self):
-        self.LogInfo('\n\tSearching for BluePrints\n')
+        self.LogInfo('\n\t\tSearching for BluePrints\n')
         for path, file in self['files']:
                 self.__add(file, path)
 
     def load(self):
-        self.LogInfo('\n\tLoading BluePrint\n')
+        self.LogInfo('\n\t\tLoading BluePrint\n')
         for blueprint in self.blueprints:
             blueprint.load()
 
     def define(self):
-        self.LogInfo('\n\tDefining BluePrint\n')
+        self.LogInfo('\n\t\tDefining BluePrint\n')
         for blueprint in self.blueprints:
             blueprint.define()
 
     def generate(self):
-        self.LogInfo('\n\tProducing BluePrint\n')
+        self.LogInfo('\n\t\tProducing BluePrint\n')
         for blueprint in self.blueprints:
             blueprint.generate()
 

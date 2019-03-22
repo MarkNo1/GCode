@@ -44,8 +44,8 @@ class IPackage(List, Dir, Mouvable):
 class Package(IPackage):
 
     def add_handler(self, handler):
-        self.Log('Adding Handler')
         if handler:
+            self.Log(f'Adding Handler: {handler.name}')
             handler.package = self.package
             self.add(handler)
 

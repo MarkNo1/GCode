@@ -36,6 +36,7 @@ class INodelet(Package):
         super().__init__(blueprint.name, blueprint.package)
         self.LogSucces('Created.')
         self.blueprint = blueprint
+        self._continue = True
         self.__init_root()
 
 
@@ -44,9 +45,15 @@ class INodelet(Package):
         # TO-DO find roscd package
         self.go(TemporaryPkgPath)
         pkg = path(self.root, self.package)
+        if exists(pkg):
+            self.LogWarn('Package already Exist')
+            self.LogWarn('Proceed ?')
+            self._continue = input('\t\t\t\t\t[y, n] :  ')
+            self._continue = True if self._continue == 'y' else False
+
         if not exists(pkg):
             self.make_dir(pkg)
-            self.go(pkg)
+        self.go(pkg)
 
 
 
@@ -54,7 +61,11 @@ class INodelet(Package):
 class Nodelet(INodelet):
     def __init__(self, blueprint):
         super().__init__(blueprint)
-        self.cpp()
+        if self._continue:
+            self.LogSucces('Proced to add Component.')
+            self.cpp()
+        else:
+            self.LogError('Operation aborted.')
 
     def cpp(self):
         # Interface

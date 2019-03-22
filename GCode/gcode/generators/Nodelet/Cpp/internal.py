@@ -48,6 +48,23 @@ def GetInternal(package_path, blueprint):
     componentName = f'{Type}{blueprint.name}'
     internalHandler = CppHandler(componentName, package_path, folder=Type)
     internalHandler.initialize(blueprint.name, blueprint.description)
-    internalHandler.header_corpus(header_content)
+
+    # Definint header content
+    interface_class = f'Interface{blueprint.name}'
+    public = [ Using(interface_class,interface_class),
+               DeclareFunction('void', 'Parameters', post='final'),
+               DeclareFunction('void', 'Topic', post='final'),
+               DeclareFunction('void', 'Initialize', post='= 0'),
+    ]
+
+    class_ = Class(blueprint.name, interface_class).adds_public(public)
+
+
+    header_corpus = [
+        Using('future::IComponent'),
+        NameSpace('generated').add(class_)
+    ]
+
+    internalHandler.header_corpus(header_corpus)
 
     return internalHandler

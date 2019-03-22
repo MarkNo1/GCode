@@ -31,5 +31,5 @@ Type = 'Interface'
 
 def GetInterface(pkg_path, blueprint):
     interface = CppHandler(f'{Type}{blueprint.name}', pkg_path,  folder = Type, source=None)
-    interface.hpp.copy(resource_path('IComponentv1.h'))
+    interface.header.hpp = File('IComponentv1',resource_path('IComponentv1.h'))
     return interface

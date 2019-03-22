@@ -32,34 +32,35 @@ from .source import Source
 class CppHandler(Mapper, Mouvable):
     def __init__(self, name, package_path, folder=None, source=None):
         super().__init__(name)
+        self.name = name
         self.go(package_path)
-        self.hpp = Header(name, package_path, folder)
-        self.cpp = Source(name, package_path, folder) if source else None
+        self.header = Header(name, package_path, folder)
+        self.source = Source(name, package_path, folder) if source else None
         self.folder = folder
 
     def initialize(self, classname, description):
         self.Log('Initializing.')
-        if self.hpp:
-            self.hpp.initialize(classname, description)
-        if self.cpp:
-            self.cpp.initialize(classname, description)
+        if self.header:
+            self.header.initialize(classname, description)
+        if self.source:
+            self.source.initialize(classname, description)
 
     def preview(self):
         self.Log(f'Preview Header')
-        self.hpp.preview()
+        self.header.preview()
         self.Log(f'Source Header')
-        self.cpp.preview()
+        self.source.preview()
 
     def header_corpus(self, corpus:list):
-        self.hpp.add_corpus(corpus)
+        self.header.add_corpus(corpus)
 
     def source_corpus(self, corpus:list):
-        self.cpp.add_corpus(corpus)
+        self.source.add_corpus(corpus)
 
     def generate(self):
         self.Log(f'Generating Header')
-        if self.hpp:
-            self.hpp.produce()
+        if self.header:
+            self.header.produce()
         self.Log(f'Generating Source')
-        if self.cpp:
-            self.cpp.produce()
+        if self.source:
+            self.source.produce()
