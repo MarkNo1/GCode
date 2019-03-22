@@ -27,21 +27,6 @@ from gcode.generators.Cpp import *
 
 Type = 'Internal'
 
-GCName='C'
-ICName='IC'
-MSG='std_msgs::bool'
-
-pub_functions = [ DeclareFunction('Parameters', pre='virtual', post='final'),
-                DeclareFunction('Topic', pre='virtual', post='final'),
-                DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg'),
-                DeclareFunction('Initialize', pre='virtual', post='= 0'),
-                DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0')]
-priv_functions = [DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0')]
-prot_functions = [DeclareFunction('void', "Test1", pre='virtual', args='bool &test', post='= 0')]
-header_content = [Using('future::IComponent'),
-                NameSpace('generated'),
-                Class(GCName, ICName).adds_public(pub_functions).adds_protected(prot_functions).adds_private(priv_functions)]
-
 
 
 def GetInternal(package_path, blueprint):

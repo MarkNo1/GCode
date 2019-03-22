@@ -45,7 +45,7 @@ class BluePrintManager(Mapper):
 
     def find(self):
         self.LogInfo('\n\t\tSearching for BluePrints\n')
-        for path, file in self['files']:
+        for path, file in self.files:
                 self.__add(file, path)
 
     def load(self):

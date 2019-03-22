@@ -48,8 +48,8 @@ class INodelet(Package):
         if exists(pkg):
             self.LogWarn('Package already Exist')
             self.LogWarn('Proceed ?')
-            self._continue = input('\t\t\t\t\t[y, n] :  ')
-            self._continue = True if self._continue == 'y' else False
+            # self._continue = input('\t\t\t\t\t[y, n] :  ')
+            # self._continue = True if self._continue == 'y' else False
 
         if not exists(pkg):
             self.make_dir(pkg)
@@ -74,3 +74,7 @@ class Nodelet(INodelet):
         self.add_handler(GetInternal(self.root, self.blueprint))
         # User
         self.add_handler(GetUser(self.root, self.blueprint))
+
+
+    def xml(self):
+        pass

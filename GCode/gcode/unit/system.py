@@ -71,5 +71,8 @@ class File(Dir):
     MAPPER
 '''
 class Mapper(Logger):
-    files = walker = Walker().start().files
-    dirs = walker = Walker().start().dirs
+    def __init__(self, path):
+        super().__init__()
+        self.Log(f'Starting searchin in: {path}')
+        self.files = walker = Walker(path).start().files
+        self.dirs = walker = Walker(path).start().dirs
