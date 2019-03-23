@@ -23,50 +23,14 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .definition import *
-from gcode.unit.system import File, Mouvable
-from gcode.primitive.filesystem import path
-
-
-class Hpp(CppContent):
-    def __init__(self, classname:str, description:str=''):
-        filename = f'{classname}.h'
-        begining = str(Incipit(filename, description))
-        begining += str(IFdef('GENERATED', classname.upper())) + '\n'
-        super().__init__(Delimiter(start=begining, trimend=';\n'))
-
-
-class IHeader(File, Mouvable):
-    def __init__(self, name, package_path, custom_folder):
-        super().__init__(name, 'To be reassinged.')
-        self.name = name
-        self.file = f'{self.name}.h'
-        self.package_path = package_path
-        self.package_name = package_path.split('/')[-1]
-        self.folder = custom_folder
-        self.__init_root__()
-        self.LogSucces('Initialized.')
-
-
-    def __init_root__(self):
-        root = path(self.package_path, 'include', self.package_name)
-        if self.folder:
-            root = path(root, self.folder)
-        self.go(path(root, self.file))
+from gcode.unit.system import Mapper, Mouvable
 
 
 
+class Handler(Mapper, Mouvable):
 
-class Header(IHeader):
-
-    def initialize(self, classname='', description=''):
-        self.hpp = Hpp(classname, description)
+    def initialize(self):
+        raise "Not Implemented"
 
     def generate(self):
-        self.write(str(self.hpp))
-
-    def preview(self):
-        self.Log(self.hpp)
-
-    def add_corpus(self, corpus:list):
-        self.hpp.adds(corpus)
+        raise "Not Implemented"

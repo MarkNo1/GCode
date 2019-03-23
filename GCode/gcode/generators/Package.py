@@ -22,51 +22,34 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import gcode
+from gcode.unit.list import List
+from gcode.unit.logger import Logger
+from gcode.unit.system import Dir, Mouvable
+from gcode.primitive.filesystem import module_path, path
 
-from .definition import *
-from gcode.unit.system import File, Mouvable
-from gcode.primitive.filesystem import path
-
-
-class Hpp(CppContent):
-    def __init__(self, classname:str, description:str=''):
-        filename = f'{classname}.h'
-        begining = str(Incipit(filename, description))
-        begining += str(IFdef('GENERATED', classname.upper())) + '\n'
-        super().__init__(Delimiter(start=begining, trimend=';\n'))
+# Path to resources
+MODULE_PATH = module_path(gcode)
+# Generate relative path
+resource_path = lambda file :  f'{MODULE_PATH}/resources/{file}'
 
 
-class IHeader(File, Mouvable):
-    def __init__(self, name, package_path, custom_folder):
-        super().__init__(name, 'To be reassinged.')
-        self.name = name
-        self.file = f'{self.name}.h'
-        self.package_path = package_path
-        self.package_name = package_path.split('/')[-1]
-        self.folder = custom_folder
-        self.__init_root__()
-        self.LogSucces('Initialized.')
-
-
-    def __init_root__(self):
-        root = path(self.package_path, 'include', self.package_name)
-        if self.folder:
-            root = path(root, self.folder)
-        self.go(path(root, self.file))
+class IPackage(List, Dir, Mouvable):
+    def __init__(self, name, package):
+        super().__init__(name)
+        self.package = package
 
 
 
+class Package(IPackage):
 
-class Header(IHeader):
-
-    def initialize(self, classname='', description=''):
-        self.hpp = Hpp(classname, description)
+    def add_handler(self, handler):
+        if handler:
+            self.Log(f'Adding Handler: {handler.name}')
+            handler.package = self.package
+            self.add(handler)
 
     def generate(self):
-        self.write(str(self.hpp))
-
-    def preview(self):
-        self.Log(self.hpp)
-
-    def add_corpus(self, corpus:list):
-        self.hpp.adds(corpus)
+        for handler in self.data:
+            self.Log(f'Generating: {handler.name}')
+            handler.generate()

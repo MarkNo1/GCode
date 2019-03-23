@@ -1,4 +1,3 @@
-# Designed for python 3.7
 
 # Copyright 2019 Marco Treglia
 #
@@ -24,48 +23,15 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from gcode.generators.handler.GenericHandler import Handler
-
-from .header import Header
-from .source import Source
+from gcode.generators.lib import Xml
 
 
-class ICppHandler(Handler):
-    def __init__(self, name, package_path, folder=None, source=None):
+class XmlHandler(Handler):
+    def __init__(self, name, package_path):
         super().__init__(name)
-        self.name = name
-        self.go(package_path)
-        self.header = Header(name, package_path, folder)
-        self.source = Source(name, package_path, folder) if source else None
-        self.folder = folder
 
-
-
-class CppHandler(ICppHandler):
-
-    def initialize(self, classname, description):
-        self.Log('Initializing.')
-        if self.header:
-            self.header.initialize(classname, description)
-        if self.source:
-            self.source.initialize(classname, description)
-
-    def preview(self):
-        self.Log(f'Preview Header')
-        self.header.preview()
-        self.Log(f'Source Header')
-        self.source.preview()
+    def initialize(self):
+        pass
 
     def generate(self):
-        self.Log(f'Generating Header')
-        if self.header:
-            self.header.generate()
-        self.Log(f'Generating Source')
-        if self.source:
-            self.source.generate()
-
-    def header_corpus(self, corpus:list):
-        self.header.add_corpus(corpus)
-
-    def source_corpus(self, corpus:list):
-        print('Source Corpus', corpus)
-        self.source.add_corpus(corpus)
+        pass

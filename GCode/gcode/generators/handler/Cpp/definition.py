@@ -196,6 +196,13 @@ class Incipit(PrettyComment):
         self.add(f'@brief\t{description}')
 
 
+# INCLUDE
+class Include(Definition):
+    def __init__(self, path:str='', library:str=''):
+        super().__init__()
+        self.add(f'include <{path}/{library}>')
+
+
 
 # NAMESPACE
 class NameSpace(CurlyBracketBlock):

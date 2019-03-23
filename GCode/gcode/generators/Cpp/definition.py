@@ -61,11 +61,6 @@ class BaseBlock(CppBase):
         self.data.append(f'{self.delimiter.trimstart}{val}{self.delimiter.trimend}')
         return self
 
-    def adds(self, elements):
-        for element in elements:
-            self = self.add(element)
-        return self
-
     def __str__(self):
         return f'{self.delimiter.start} {super().__str__()} {self.delimiter.end}'
 
@@ -76,7 +71,9 @@ class CppContentOld(BaseBlock):
         begining += str(IFdef('GENERATED',classname.upper())) + '\n'
         super().__init__(Delimiter(start=begining, trimend=';\n'))
 
-
+    def adds(self, elements):
+        for element in elements:
+            self = self.add(element)
 
 class CppContent(BaseBlock):
     def adds(self, elements):
@@ -188,13 +185,6 @@ class IFdef(Definition):
         self.add(f'define __{filegender}__{classname}__')
 
 
-# INCLUDE
-class Include(Definition):
-    def __init__(self, path:str='', library:str=''):
-        super().__init__()
-        self.add(f'include <{path}/{library}>')
-
-
 
 # INCIPIT
 class Incipit(PrettyComment):
@@ -204,6 +194,13 @@ class Incipit(PrettyComment):
         self.add(f'@data\t{time()}')
         self.add(f'@author\tGenerated using gcode by {AUTHOR}')
         self.add(f'@brief\t{description}')
+
+
+# INCLUDE
+class Include(Definition):
+    def __init__(self, path:str='', library:str=''):
+        super().__init__()
+        self.add(f'include <{path}/{library}>')
 
 
 
@@ -236,7 +233,6 @@ class Variable(CppBase):
             self.add(f'{type} {name}')
 
 
-
 # DECLARE FUCTION
 class DeclareFunction(BaseBlock):
     def __init__(self, returntype:str='', name:str='', args:str='',
@@ -251,6 +247,7 @@ class DeclareFunction(BaseBlock):
             self.add(post)
 
 
+#ImplmenntedFunction
 class ImplementedFucntion(CurlyBracketBlock):
     def __init__(self, returntype:str='', name:str='', args:str='',
                  pre:str='', post:str='', body:list=[]):
@@ -259,6 +256,7 @@ class ImplementedFucntion(CurlyBracketBlock):
         self.add(body)
 
 
+# ImplementedMethod
 class ImplementedMethod(CurlyBracketBlock):
     def __init__(self, returntype:str='', classname:str='', name:str='', args:str='',
                  pre:str='', post:str='', body:list=[]):
@@ -266,7 +264,6 @@ class ImplementedMethod(CurlyBracketBlock):
         incipit = DeclareFunction(returntype,method_name,args,pre)
         super().__init__(incipit)
         self.adds(body)
-
 
 
 # CALL FUNCTION
@@ -382,24 +379,7 @@ if __name__ == '__main__':
 
     print(file)
 
-    # Versione 3.1
-
-    FParameters = dict(name='Parameters',pre='virtual',post='final',classname='GClass', body='jisdbgq;kjdfbvkqjebfvk')
-    FTopic = dict(name='Topic', pre='virtual', post='final')
-
-    pub_f = [ ImplementedMethod(**FParameters),
-                DeclareFunction(**FTopic),
-                DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg'),
-                DeclareFunction('Initialize', pre='virtual', post='= 0'),
-                DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0'),
-    ]
-
-    priv_f = [DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0')]
-
-    proc_f = [DeclareFunction('void', "Test1", pre='virtual', args='bool &test', post='= 0')]
-
-
-
+    # Versione 3
     file3 = CppContentOld(GCName, 'Third attempt generate code.')
 
     file_content = [Using('future::IComponent'),

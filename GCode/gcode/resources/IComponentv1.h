@@ -20,7 +20,7 @@ namespace future {
  *  @class  IComponent
  *  @brief  Interface for the Component skeletons.
  */
-class InterfaceComponent : public Nodelet {
+class Internal : public Nodelet {
  public:
   using Nodelet::Nodelet;
 
