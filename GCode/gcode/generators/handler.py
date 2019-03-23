@@ -27,7 +27,7 @@ from gcode.unit.system import Mapper, Mouvable
 
 
 
-class Handler(Mapper, Mouvable):
+class Handler(Mouvable):
 
     def initialize(self):
         raise "Not Implemented"

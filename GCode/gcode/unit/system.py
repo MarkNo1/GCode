@@ -20,7 +20,7 @@ class Dir(Logger):
             mkdir(dir)
             self.Log(f'Directory created: {dir}', True)
             return None
-        self.LogWarn(f'Directory already exist {dir}')
+        # self.LogWarn(f'Directory already exist {dir}')
 
     def dir_validator(self, file):
         dir = parent_dir(file)

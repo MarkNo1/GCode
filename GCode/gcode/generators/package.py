@@ -23,14 +23,34 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.unit.system import Mapper, Mouvable
+import gcode
+from gcode.unit.list import List
+from gcode.unit.system import Dir, Mouvable
+from gcode.primitive.filesystem import module_path, path
+
+
+# Path to resources
+MODULE_PATH = module_path(gcode)
+# Generate relative path
+resource_path = lambda file :  f'{MODULE_PATH}/resources/{file}'
+
+
+class IPackage(List, Dir, Mouvable):
+    def __init__(self, name, package):
+        super().__init__(name)
+        self.package = package
 
 
 
-class Handler(Mapper, Mouvable):
+class Package(IPackage):
 
-    def initialize(self):
-        raise "Not Implemented"
+    def add_handler(self, handler):
+        if handler:
+            self.Log(f'\nAdding Handler: {handler.name}')
+            handler.package = self.package
+            self.add(handler)
 
     def generate(self):
-        raise "Not Implemented"
+        for handler in self.data:
+            self.Log(f'\nGenerating: {handler.name}')
+            handler.generate()

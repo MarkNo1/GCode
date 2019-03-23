@@ -25,7 +25,7 @@
 
 from gcode.generators.package import resource_path
 from gcode.unit.system import File
-from gcode.generators import CppHandler
+from gcode.generators.Cpp import CppHandler
 
 Type = 'Internal'
 

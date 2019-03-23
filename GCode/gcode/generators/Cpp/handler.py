@@ -23,7 +23,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.generators.handler.GenericHandler import Handler
+from gcode.generators.handler import Handler
 
 from .header import Header
 from .source import Source
@@ -67,5 +67,4 @@ class CppHandler(ICppHandler):
         self.header.add_corpus(corpus)
 
     def source_corpus(self, corpus:list):
-        print('Source Corpus', corpus)
         self.source.add_corpus(corpus)

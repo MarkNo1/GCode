@@ -22,8 +22,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.generators.handler.GenericHandler import Handler
-from gcode.generators.lib import Xml
+from gcode.generators.handler import Handler
+from .xml import Xml
 
 
 class XmlHandler(Handler):

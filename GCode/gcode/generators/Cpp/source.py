@@ -71,5 +71,4 @@ class Source(ISource):
         self.Log(self.cpp)
 
     def add_corpus(self, corpus:list):
-        print('Adds', corpus)
         self.cpp.adds(corpus)

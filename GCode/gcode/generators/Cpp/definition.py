@@ -61,6 +61,12 @@ class BaseBlock(CppBase):
         self.data.append(f'{self.delimiter.trimstart}{val}{self.delimiter.trimend}')
         return self
 
+    def adds(self, elements):
+        for element in elements:
+            self = self.add(element)
+        return self
+
+
     def __str__(self):
         return f'{self.delimiter.start} {super().__str__()} {self.delimiter.end}'
 
@@ -71,9 +77,6 @@ class CppContentOld(BaseBlock):
         begining += str(IFdef('GENERATED',classname.upper())) + '\n'
         super().__init__(Delimiter(start=begining, trimend=';\n'))
 
-    def adds(self, elements):
-        for element in elements:
-            self = self.add(element)
 
 class CppContent(BaseBlock):
     def adds(self, elements):
