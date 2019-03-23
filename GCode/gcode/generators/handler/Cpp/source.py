@@ -26,46 +26,46 @@
 from .definition import *
 from gcode.unit.system import File, Mouvable
 from gcode.primitive.filesystem import path
-from gcode.generators.Cpp.definition import CppContent
+
+class Cpp(CppContent):
+        def __init__(self, classname:str, lib:str='', description:str=''):
+            filename = f'{classname}.cc'
+            begining = str(Incipit(filename, description))
+            begining += str(Include(lib, filename)) + '\n'
+            super().__init__(Delimiter(start=begining, trimend=';\n'))
 
 
-class Hpp(CppContent):
-    def __init__(self, classname:str, description:str=''):
-        filename = f'{classname}.h'
-        begining = str(Incipit(filename, description))
-        begining += str(IFdef('GENERATED', classname.upper())) + '\n'
-        super().__init__(Delimiter(start=begining, trimend=';\n'))
 
-
-class IHeader(File, Mouvable):
+class ISource(File, Mouvable):
     def __init__(self, name, package_path, custom_folder):
-        super().__init__(name, 'To be reassinged.')
+        super().__init__(name)
         self.name = name
-        self.file = f'{self.name}.h'
+        self.file = f'{self.name}.cc'
         self.package_path = package_path
-        self.package_name = package_path.split('/')[-1]
-        self.folder = custom_folder
+        sefl.package_name = package_path.split('/')[-2]
+        self.lib = f'{package_path}'
         self.__init_root__()
 
     def __init_root__(self):
-        root = path(self.package_path, 'include', self.package_name)
+        root = path(self.package_name, 'src', self.name)
         if self.folder:
             root = path(root, self.folder)
+            self.lib = f'{self.lib}/{self.folder}'
         self.go(path(root, self.file))
 
 
 
 
-class Header(IHeader):
+class Source(ISource):
 
     def initialize(self, classname='', description=''):
-        self.hpp = Hpp(classname, description)
+        self.cpp = Cpp(classname, self.lib, description)
 
-    def produce(self):
-        self.write(str(self.hpp))
+    def generate(self):
+        self.write(self.cpp)
 
     def preview(self):
-        self.Log(self.hpp)
+        self.Log(self.cpp)
 
     def add_corpus(self, corpus:list):
-        self.hpp.adds(corpus)
+        self.cpp.adds(corpus)

@@ -24,9 +24,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from gcode.unit.base import Atom
-from gcode.generators.Package import Package
-from gcode.generators.Cpp.handler import CppHandler
-from gcode.generators.Nodelet.Cpp import GetInterface, GetInternal, GetUser
+from gcode.generators.package import Package
+from gcode.generators.handler import CppHandler
+from .Cpp import GetInterface, GetInternal, GetUser
 from gcode.primitive import path, exists
 
 TemporaryPkgPath = '/home/marco/Desktop/Generated'

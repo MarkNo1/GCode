@@ -23,50 +23,48 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .definition import *
-from gcode.unit.system import File, Mouvable
-from gcode.primitive.filesystem import path
-from gcode.generators.Cpp.definition import CppContent
+from gcode.generators.handler.GenericHandler import Handler
 
-class Cpp(CppContent):
-        def __init__(self, classname:str, lib:str='', description:str=''):
-            filename = f'{classname}.cc'
-            begining = str(Incipit(filename, description))
-            begining += str(Include(lib, filename)) + '\n'
-            super().__init__(Delimiter(start=begining, trimend=';\n'))
+from .header import Header
+from .source import Source
 
 
-
-class ISource(File, Mouvable):
-    def __init__(self, name, package_path, custom_folder):
+class ICppHandler(Handler):
+    def __init__(self, name, package_path, folder=None, source=None):
         super().__init__(name)
         self.name = name
-        self.file = f'{self.name}.cc'
-        self.package_path = package_path
-        sefl.package_name = package_path.split('/')[-2]
-        self.lib = f'{package_path}'
-        self.__init_root__()
-
-    def __init_root__(self):
-        root = path(self.package_name, 'src', self.name)
-        if self.folder:
-            root = path(root, self.folder)
-            self.lib = f'{self.lib}/{self.folder}'
-        self.go(path(root, self.file))
+        self.go(package_path)
+        self.header = Header(name, package_path, folder)
+        self.source = Source(name, package_path, folder) if source else None
+        self.folder = folder
 
 
 
+class CppHandler(ICppHandler):
 
-class Source(ISource):
-
-    def initialize(self, classname='', description=''):
-        self.cpp = Cpp(classname, self.lib, description)
-
-    def produce(self):
-        self.write(self.cpp)
+    def initialize(self, classname, description):
+        self.Log('Initializing.')
+        if self.header:
+            self.header.initialize(classname, description)
+        if self.source:
+            self.source.initialize(classname, description)
 
     def preview(self):
-        self.Log(self.cpp)
+        self.Log(f'Preview Header')
+        self.header.preview()
+        self.Log(f'Source Header')
+        self.source.preview()
 
-    def add_corpus(self, corpus:list):
-        self.cpp.adds(corpus)
+    def generate(self):
+        self.Log(f'Generating Header')
+        if self.header:
+            self.header.generate()
+        self.Log(f'Generating Source')
+        if self.source:
+            self.source.generate()
+
+    def header_corpus(self, corpus:list):
+        self.header.add_corpus(corpus)
+
+    def source_corpus(self, corpus:list):
+        self.source.add_corpus(corpus)

@@ -1,6 +1,6 @@
 from .logger import Logger
 from gcode.primitive.walker import Walker
-from gcode.primitive.filesystem import module_path, path, write, read, exists, parent_dir, mkdir
+from gcode.primitive.filesystem import pwd, module_path, path, write, read, exists, parent_dir, mkdir
 
 '''
     MOUVABLE
@@ -71,8 +71,8 @@ class File(Dir):
     MAPPER
 '''
 class Mapper(Logger):
-    def __init__(self, path):
-        super().__init__()
+    def __init__(self, target='',  path=pwd()):
+        super().__init__(target)
         self.Log(f'Starting searchin in: {path}')
         self.files = walker = Walker(path).start().files
         self.dirs = walker = Walker(path).start().dirs

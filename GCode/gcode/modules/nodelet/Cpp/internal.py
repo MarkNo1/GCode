@@ -22,14 +22,34 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+from gcode.generators import CppHandler
+from gcode.generators.lib.cpp import *
 
-from gcode.generators.Package import resource_path
-from gcode.unit.system import File
-from gcode.generators.Cpp.handler import CppHandler
+Type = 'Internal'
 
-Type = 'Interface'
 
-def GetInterface(pkg_path, blueprint):
-    interface = CppHandler(f'{Type}{blueprint.name}', pkg_path,  folder = Type, source=None)
-    interface.header.hpp = File('IComponentv1',resource_path('IComponentv1.h'))
-    return interface
+
+def GetInternal(package_path, blueprint):
+    componentName = f'{Type}{blueprint.name}'
+    internalHandler = CppHandler(componentName, package_path, folder=Type)
+    internalHandler.initialize(blueprint.name, blueprint.description)
+
+    # Definint header content
+    interface_class = f'Interface{blueprint.name}'
+    public = [ Using(interface_class,interface_class),
+               DeclareFunction('void', 'Parameters', post='final'),
+               DeclareFunction('void', 'Topic', post='final'),
+               DeclareFunction('void', 'Initialize', post='= 0'),
+    ]
+
+    class_ = Class(blueprint.name, interface_class).adds_public(public)
+
+
+    header_corpus = [
+        Using('future::IComponent'),
+        NameSpace('generated').add(class_)
+    ]
+
+    internalHandler.header_corpus(header_corpus)
+
+    return internalHandler

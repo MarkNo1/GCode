@@ -1,16 +1,16 @@
 from gcode import BluePrintManager
+from gcode.primitive import pwd
 import sys
-import os
 
 
 if __name__ == '__main__':
     # Start the manager in the current path
+    if len(sys.argv) > 1:
+        starting_path = sys.argv[1]
+    else:
+        starting_path = pwd()
 
-    starting_path = sys.argv[1]
-    print(sys.argv)
-    print('Changign to ', starting_path)
-
-    manager = BluePrintManager(starting_path)
+    manager = BluePrintManager('0-5', starting_path)
 
     # Find all
     manager.find()

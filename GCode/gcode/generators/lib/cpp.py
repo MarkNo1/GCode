@@ -23,306 +23,344 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.primitive import Dictionary
+
 from gcode.primitive.time import time
-from gcode.unit.base import Atom
-from gcode.unit.logger import Logger
 from gcode.unit.list import List
+from gcode.unit.logger import Logger
 
 
-class CppComponent(Atom):
+AUTHOR = 'M.Treglia (AKKA)'
+
+
+# Base Definition Class
+class CppBase(List):
     def __init__(self):
         super().__init__()
+        self.data = []
 
 
-class Delimiter(Atom):
-    def __init__(self, start: str = '{', end: str='}'):
+
+# Delimiter
+class Delimiter(CppBase):
+    def __init__(self, start: str = '', end: str='', trimstart:str ='', trimend:str=''):
         super().__init__()
         self.start = start
         self.end = end
+        self.trimstart = trimstart
+        self.trimend = trimend
 
 
 
-class Block(List):
+# Base Block
+class BaseBlock(CppBase):
     def __init__(self, delimiter:Delimiter = Delimiter()):
-        super().__init__('Body')
-        self.data = []
+        super().__init__()
         self.delimiter = delimiter
-        self.add(f'{self.delimiter.start}\n')
-
-    def __str__(self):
-        if self.delimiter.end:
-            if self.delimiter.end not in self.data[-1]:
-                self.add(self.delimiter.end)
-        return super().__str__()
-
-
-class ClassGender(Block):
-    def __init__(self, type:str = 'public'):
-        super().__init__(delimiter=Delimiter(start=':', end=None))
-        self.type = type
 
     def add(self, val):
-        self.data.append(f'\t{val}')
+        self.data.append(f'{self.delimiter.trimstart}{val}{self.delimiter.trimend}')
         return self
 
     def __str__(self):
-        return f'{self.type}{super().__str__()}'
+        return f'{self.delimiter.start} {super().__str__()} {self.delimiter.end}'
 
 
-class Public(ClassGender):
-    pass
+class CppContentOld(BaseBlock):
+    def __init__(self, classname:str, description:str=''):
+        begining = str(Incipit(classname,description))
+        begining += str(IFdef('GENERATED',classname.upper())) + '\n'
+        super().__init__(Delimiter(start=begining, trimend=';\n'))
+
+    def adds(self, elements):
+        for element in elements:
+            self = self.add(element)
+
+class CppContent(BaseBlock):
+    def adds(self, elements):
+        for element in elements:
+            self = self.add(element)
 
 
-class Protected(ClassGender):
+
+# Gender Block
+class GenderBlock(BaseBlock):
+    def __init__(self, type:str = ''):
+        super().__init__(delimiter=Delimiter(start=':\n', end='', trimstart='\t\t', trimend=';\n'))
+        self.incipit = type
+
+    def __str__(self):
+        return f'{self.incipit}{super().__str__()}'
+
+
+# Public Block
+class Public(GenderBlock):
+    def __init__(self):
+        super().__init__('public')
+
+
+# Protected Block
+class Protected(GenderBlock):
     def __init__(self):
         super().__init__('protected')
 
 
-class Private(ClassGender):
+# Private Block
+class Private(GenderBlock):
     def __init__(self):
         super().__init__('private')
 
 
-# Class Enum
-PUBLIC = 3
-PROTECTED = 4
-PRIVATE = 5
 
-class Class(Block):
-    def __init__(self, name, inheritance=''):
+# Round Bracket
+class RoundBracketBlock(BaseBlock):
+    def __init__(self, incipit:str = ''):
+        super().__init__(delimiter=Delimiter(start='(', end=')', trimend=','))
+        self.incipit = incipit
+
+    def __str__(self):
+        return f'{self.incipit}{super().__str__()}'
+
+
+# Square Bracket
+class SquareBracketBlock(BaseBlock):
+    def __init__(self, incipit:str = ''):
+        super().__init__(delimiter=Delimiter(start='[', end=']', trimend=','))
+        self.incipit = incipit
+
+    def __str__(self):
+        return f'{self.incipit}{super().__str__()}'
+
+
+# Curly Bracket
+class CurlyBracketBlock(BaseBlock):
+    def __init__(self, incipit:str = ''):
+        super().__init__(delimiter=Delimiter(start='{\n', end='}',trimstart='\t', trimend=';\n'))
+        self.incipit = incipit
+
+    def __str__(self):
+        return f'{self.incipit}{super().__str__()}'
+
+
+
+# Comment
+class Comment(BaseBlock):
+    def __init__(self):
+        super().__init__(delimiter=Delimiter(start='', end='', trimstart='//'))
+
+
+# Pretty Comment
+class PrettyComment(BaseBlock):
+    def __init__(self, n_stars):
+        stars = '*' * n_stars
+        start = f'/{stars}\n'
+        end = f'{stars}/'
+        super().__init__(delimiter=Delimiter(start=start,
+                                             end=end,
+                                             trimstart='*  ', trimend='\n'))
+
+
+
+
+# Definition - start with #
+class Definition(BaseBlock):
+    def __init__(self):
+        super().__init__(delimiter=Delimiter(start='', end='', trimstart='\n#'))
+
+
+# Statement - end with ;
+class Statement(BaseBlock):
+    def __init__(self):
+        super().__init__(delimiter=Delimiter(start='', end='', trimend=' '))
+
+
+
+#### C++ Component
+
+
+# IFDEF
+class IFdef(Definition):
+    def __init__(self, filegender:str='', classname:str=''):
         super().__init__()
-        self.name = name
-        self.inheritance = inheritance
-        self.add(Public())
-        self.public = self.__len__()
-        self.add(Protected())
-        self.add(Private())
+        self.add(f'ifdef __{filegender}__{classname}__')
+        self.add(f'define __{filegender}__{classname}__')
 
-    def add_public(self, val):
-        print(self.data[PUBLIC])
-        self.data[PUBLIC].add(val)
+
+
+# INCIPIT
+class Incipit(PrettyComment):
+    def __init__(self, filename, description):
+        super().__init__(50)
+        self.add(f'@file\t{filename}')
+        self.add(f'@data\t{time()}')
+        self.add(f'@author\tGenerated using gcode by {AUTHOR}')
+        self.add(f'@brief\t{description}')
+
+
+
+# NAMESPACE
+class NameSpace(CurlyBracketBlock):
+    def __init__(self, namespace:str = ''):
+        incipit = f'namespace {namespace}'
+        super().__init__(incipit)
+
+
+
+# USING
+class Using(CppBase):
+    def __init__(self, library:str='', alias:str=''):
+        super().__init__()
+        if alias:
+            self.add(f'using {alias} = {library}')
+        else:
+            self.add(f'using {library}')
+
+
+
+# DECLARE VARIABLE
+class Variable(CppBase):
+    def __init__(self, type:str='', name:str='', init:str=''):
+        super().__init__()
+        if init:
+            self.add(f'{type} {name} = {init}')
+        else:
+            self.add(f'{type} {name}')
+
+
+
+# DECLARE FUCTION
+class DeclareFunction(BaseBlock):
+    def __init__(self, returntype:str='', name:str='', args:str='',
+                 pre:str='', post:str=''):
+        super().__init__()
+        if pre:
+            self.add(pre)
+        self.add(returntype)
+        self.add(name)
+        self.add(f'({args})')
+        if post:
+            self.add(post)
+
+
+# CALL FUNCTION
+class CallFunction(BaseBlock):
+    def __init__(self, name:str='', args:str=''):
+        super().__init__()
+        self.add(name)
+        self.add(f'({args})')
+
+
+
+# IF
+class IF(CurlyBracketBlock):
+    def __init__(self, condition:str='', body:str=''):
+        super().__init__(f'if ({condition})')
+        self.add(body)
+
+
+
+# CLASS
+class Class(CurlyBracketBlock):
+    def __init__(self, name:str='', inheritance:str=''):
+        incipit = f'class {name} '
+        if inheritance:
+            incipit += f'public: {inheritance}'
+        super().__init__(incipit)
+        self.public = Public()
+        self.private = Private()
+        self.protected = Protected()
+
+    def add_public(self, element):
+        self.public = self.public.add(element)
         return self
 
-    def add_protected(self, val):
-        self.data[PROTECTED].add(val)
+    def adds_public(self, elements):
+        for element in elements:
+            self.public = self.public.add(element)
         return self
 
-    def add_private(self, val):
-        self.data[PRIVATE].add(val)
+    def add_protected(self, element):
+        self.protected = self.protected.add(element)
         return self
 
-    def __str__(self):
-        class_ = f'class {self.name} '
-        if self.inheritance:
-            class_ += f'public: {self.inheritance}'
+    def adds_protected(self, elements):
+        for element in elements:
+            self.protected = self.protected.add(element)
+        return self
 
-        return f'{class_} {super().__str__()}'
+    def add_private(self, element):
+        self.private = self.private.add(element)
+        return self
 
-
-
-class Incipit(CppComponent):
-    def __init__(self, name, brief):
-        super().__init__()
-        self.name = name
-        self.brief = brief
-
-    def __str__(self):
-        return f'/**************************************************************************\n\
-             * \n\
-             *  @file 	 {self.name}.h \n\
-             *  @date 	 {time()}\n\
-             *  @author Generated using GCode (T.M. Akka) \n\
-             *  @brief 	 {self.brief}\n\
-             *************************************************************************/\n'
-
-
-class IfDef(CppComponent):
-    def __init__(self, type, classname):
-        super().__init__()
-        self.type = type
-        self.classname = classname
-
-    def __str__(self):
-        return f'#ifndef __{self.type}_{self.classname}__\
-                 \n#define __{self.type}_{self.classname}__'
-
-
-class Include(CppComponent):
-    def __init__(self, package, lib):
-        super().__init__()
-        self.package = package
-        self.lib = lib
-
-    def __str__(self):
-        return f'#include <{self.package}/{self.lib}.h>'
-
-
-
-class Namespace(CppComponent):
-    def __init__(self, name):
-        super().__init__()
-        self.name = name
-        self.body_block = Block()
-
-    def add(self, element):
-        self.body_block.add(element)
+    def adds_private(self, elements):
+        for element in elements:
+            self.private = self.private.add(element)
         return self
 
     def __str__(self):
-        return f'namespace {self.name} {self.body_block}'
-
-
-
-class Using(CppComponent):
-    def __init__(self, lib, alias=None):
-        super().__init__()
-        self.lib=lib
-        self.alias=alias
-
-    def __str__(self):
-        return f'using {self.alias} = {self.lib};' if self.alias else f'using {self.lib};'
-
-class DeclareFunction(CppComponent):
-    def __init__(self, name, return_type='void', args='', body='', pre='', post=''):
-        super().__init__()
-        self.name = name
-        self.return_type = return_type
-        self.args = args
-        self.body = Block()
-        self.pre = pre
-        self.post = post
-
-    def __str__(self):
-        to_return = ''
-        if self.pre:
-            to_return += f'{self.pre}'
-        to_return = f'{self.return_type} {self.name}({self.args})'
-        if self.post:
-            to_return += f'{self.post}'
-        if self.block:
-            to_return += f'{self.body}'
-        return to_return + ';'
-
-
-class Call_function(CppComponent):
-    def __init__(self, name, args=''):
-        super().__init__()
-        self.name = name
-        self.args = args
-
-    def __str__(self):
-        return f'{self.name}({self.args});'
-
-class Decl_variable(CppComponent):
-    def __init__(self, type, name, init=None ):
-        super().__init__()
-        self.type = type
-        self.name = name
-        self.init = init
-
-    def __str__(self):
-        return f'{self.type} {self.name} = {self.init};\n' if init else f'{self.type} {self.name};\n'
-
-class IF(CppComponent):
-    def __init__(self, condition, body, else_body=None):
-        super().__init__()
-        self.condition = condition
-        self.body = body
-        self.else_body = else_body
-
-    def __str__(self):
-        return f'if ({self.condition}) {Block(self.body)} else {Block(self.else_body)};\n' if self.else_body \
-                else f'if ({self.condition}) {Block(self.body)};'
-
-
-
-
-class Code(List):
-    pass
-
-
-
-class InterfaceCppMapping(Logger):
-    def __init__(self, name):
-        super().__init__(name)
-        self.code = Code()
-
-    def add(self, element):
-        self.code.add(element)
-
-    def get_last(self):
-        return self.code[-1]
-
-
-
-class CppMapping(InterfaceCppMapping):
-    pass
-
-
-
-# Cpp generator
-
-DATA = 'data'
-CPP = 'cpp'
-
-
-class Cpp_old:
-    def __init__(self, data):
-        self.details = Dictionary()
-        self.details[ DATA ] = data
-        self.details[ CPP ] = ''
-
-    def generate(self):
-        self.flush()
-        for line in self.details.data:
-            print('Line: ',line)
-            for key, element in line.items():
-                print('Key: ', key)
-                print('Element: ',*element)
-                self.details.cpp += CALL(line)
-
-    def flush(self):
-        self.details.cpp = ''
+        self.data = []
+        if len(self.public) > 0:
+            self.add(self.public)
+        if len(self.protected) > 0:
+            self.add(self.protected)
+        if len(self.private) > 0:
+            self.add(self.private)
+        return super().__str__()
 
 
 # TESTING
 if __name__ == '__main__':
 
-    cpp = CppMapping
-
-    GCName = 'GTest'
+    GCName = 'GTestClass'
     ICName = 'IComponent'
 
     MSG='std_msg::bool'
 
-    GCH = CppMapping('GeneratedComponentHeader')
-    # Incipit
-    GCH.add(Incipit(GCName, 'First attempt generate code.'))
-    # IfDef
-    GCH.add(IfDef('Generated', GCName))
+
+    file = CppContentOld(GCName, 'First attempt generate code.')
+
     # Using
-    GCH.add(Using('future::IComponent'))
+    file.add(Using('future::IComponent'))
     # NameSpace
-    GCH.add(
-            Namespace('generated').add(
-                Class(GCName, ICName).add_public(
-                    Using('IComponent::IComponent')
-                    ).add_public('public:'
-                    ).add_public(DeclareFunction('Parameters', pre='virtual', post='final')
-                    ).add_public(DeclareFunction('Topic', pre='virtual', post='final')
-                    ).add_public(DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg')
-                    ).add_public(DeclareFunction('Initialize', pre='virtual', post='= 0')
-                    ).add_public('private:'
-                    )
-                )
-            )
+    file.add(NameSpace('generated'))
 
-    C = Class(GCName, ICName)
-    for i in range(10):
-        C.add('Test'+ str(i))
+# Version 1
+    # Class(GCName, ICName).add_public(Using('IComponent::IComponent'))
+    #                                     .add_public(DeclareFunction('Parameters', pre='virtual', post='final'))
+    #                                     .add_public(DeclareFunction('Topic', pre='virtual', post='final'))
+    #                                     .add_public(DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg'))
+    #                                     .add_public(DeclareFunction('Initialize', pre='virtual', post='= 0'))
+    #                                     .add_private(DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0'))
+    #                                     .add_protected(DeclareFunction('void', "Test1", pre='virtual', args='bool &test', post='= 0'))
+    #                                     )
+    #         )
+
+# Version 2
+
+    pub_f = [ DeclareFunction('Parameters', pre='virtual', post='final'),
+                DeclareFunction('Topic', pre='virtual', post='final'),
+                DeclareFunction(f'Callback{MSG}',args=f'const std_msgs::bool & msg'),
+                DeclareFunction('Initialize', pre='virtual', post='= 0'),
+                DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0'),
+    ]
+
+    priv_f = [DeclareFunction('void', "Test", pre='virtual', args='bool &test', post='= 0')]
+
+    proc_f = [DeclareFunction('void', "Test1", pre='virtual', args='bool &test', post='= 0')]
 
 
-    print(GCH.code)
+    C = Class(GCName, ICName).adds_public(pub_f).adds_protected(proc_f).adds_private(priv_f)
 
-    print(C)
+    file.add(C)
+
+    print(file)
+
+    # Versione 3
+    file3 = CppContentOld(GCName, 'Third attempt generate code.')
+
+    file_content = [Using('future::IComponent'),
+                    NameSpace('generated'),
+                    Class(GCName, ICName).adds_public(pub_f).adds_protected(proc_f).adds_private(priv_f)]
+
+    file3.adds(file_content)
+
+    print(file3)

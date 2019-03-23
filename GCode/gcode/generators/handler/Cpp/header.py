@@ -23,44 +23,48 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode import Dictionary
-from gcode.primitive import fd, exists, mkdir, path
-from gcode.primitive import UseStyle
-from gcode.unit.system import Mouvable
-# .Componet
-import yaml
-# Modules
-from gcode.modules import Nodelet
+from .definition import *
+from gcode.unit.system import File, Mouvable
+from gcode.primitive.filesystem import path
+
+
+class Hpp(CppContent):
+    def __init__(self, classname:str, description:str=''):
+        filename = f'{classname}.h'
+        begining = str(Incipit(filename, description))
+        begining += str(IFdef('GENERATED', classname.upper())) + '\n'
+        super().__init__(Delimiter(start=begining, trimend=';\n'))
+
+
+class IHeader(File, Mouvable):
+    def __init__(self, name, package_path, custom_folder):
+        super().__init__(name, 'To be reassinged.')
+        self.name = name
+        self.file = f'{self.name}.h'
+        self.package_path = package_path
+        self.package_name = package_path.split('/')[-1]
+        self.folder = custom_folder
+        self.__init_root__()
+
+    def __init_root__(self):
+        root = path(self.package_path, 'include', self.package_name)
+        if self.folder:
+            root = path(root, self.folder)
+        self.go(path(root, self.file))
 
 
 
-class IBluePrint(Mouvable):
-    def __init__(self, name, path):
-        super().__init__(name)
-        self.go(path)
-        self.blueprint = None
-        self.Log('Created.', True)
 
-    def create_component(self):
-        if self.blueprint.mode == 'Nodelet':
-            self.component = Nodelet(self.blueprint)
+class Header(IHeader):
 
-
-
-class BluePrint(IBluePrint):
-
-    def load(self):
-        self.blueprint = Dictionary(yaml.load(fd(self.root)))
-        self.Log('Configuration Loaded.', True)
-
-    def define(self):
-        self.Log('Creating Component')
-        # Create the suited component
-        self.create_component()
+    def initialize(self, classname='', description=''):
+        self.hpp = Hpp(classname, description)
 
     def generate(self):
-        self.Log('Generating Component')
-        if self.component:
-            self.component.generate()
-        else:
-            self.LogError('Format not supported')
+        self.write(str(self.hpp))
+
+    def preview(self):
+        self.Log(self.hpp)
+
+    def add_corpus(self, corpus:list):
+        self.hpp.adds(corpus)

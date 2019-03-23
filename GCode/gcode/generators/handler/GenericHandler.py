@@ -23,44 +23,14 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gcode.unit.system import Mapper, Mouvable, File
-
-from .header import Header
-from .source import Source
+from gcode.unit.system import Mapper, Mouvable
 
 
-class CppHandler(Mapper, Mouvable):
-    def __init__(self, name, package_path, folder=None, source=None):
-        super().__init__(name)
-        self.name = name
-        self.go(package_path)
-        self.header = Header(name, package_path, folder)
-        self.source = Source(name, package_path, folder) if source else None
-        self.folder = folder
 
-    def initialize(self, classname, description):
-        self.Log('Initializing.')
-        if self.header:
-            self.header.initialize(classname, description)
-        if self.source:
-            self.source.initialize(classname, description)
+class Handler(Mapper, Mouvable):
 
-    def preview(self):
-        self.Log(f'Preview Header')
-        self.header.preview()
-        self.Log(f'Source Header')
-        self.source.preview()
-
-    def header_corpus(self, corpus:list):
-        self.header.add_corpus(corpus)
-
-    def source_corpus(self, corpus:list):
-        self.source.add_corpus(corpus)
+    def initialize(self):
+        raise "Not Implemented"
 
     def generate(self):
-        self.Log(f'Generating Header')
-        if self.header:
-            self.header.produce()
-        self.Log(f'Generating Source')
-        if self.source:
-            self.source.produce()
+        raise "Not Implemented"
