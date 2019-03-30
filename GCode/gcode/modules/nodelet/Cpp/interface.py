@@ -28,59 +28,64 @@ from gcode.generators.Cpp import *
 Type = 'Interface'
 
 
+def get_internal_include(blueprint):
+    return f'{blueprint.package}/Internal', 'Internal.h'
+
+
+
 def GetInterface(package_path, blueprint):
-    componentName = f'{Type}{blueprint.name}'
-    internalHandler = CppHandler(componentName, package_path, folder=Type, source=True)
+    classname = f'{Type}{blueprint.name}'
+    internalHandler = CppHandler(classname, package_path, folder=Type, source=True)
     internalHandler.initialize(blueprint.name, blueprint.description)
 
-    # Class Name
-    classname = f'Interface{blueprint.name}'
+    '''
+            Definition Class Internal
+    '''
 
+    CLASS = Class(blueprint.name, classname)
 
-    # Public functions
-
-    DParameters = dict(name='Parameters',
+    Parameters = dict(name='Parameters',
                        classname=classname,
                        returntype='void',
                        pre='virtual',
                        post='final',
                        body=['//TO-DO'])
 
-    DTopics = dict(name='Parameters',
+    Topics = dict(name='Topics',
                        classname=classname,
                        returntype='void',
                        pre='virtual',
                        post='final',
                        body=['//TO-DO'])
 
-    DInitialize = dict(name='Initialize',
+    Initialize = dict(name='Initialize',
                        returntype='void',
                        pre='virtual',
                        post='=0',
                        body='')
 
-    # Header
-    public = [ Using(classname,classname),
-               DeclareFunction(**DParameters),
-               DeclareFunction(**DTopics),
-               DeclareFunction(**DInitialize)]
 
-    # Header class
-    header_class = Class(blueprint.name, classname).adds_public(public)
-    # Header corpus
-    internalPath = f'{blueprint.package}/Internal'
-    internalLib = 'Internal.h'
-    header_corpus = [Include(internalPath, internalLib), Using('future::Internal'), NameSpace('generated').add(header_class)]
-    # Add header
-    internalHandler.header_corpus(header_corpus)
+    CLASS.adds_public([Using(classname,classname),
+                        DeclareFunction(**Parameters),
+                        DeclareFunction(**Topics),
+                        DeclareFunction(**Initialize)])
 
-    # Source
 
-    # Functions
-    functions = [ImplementedMethod(**DParameters), ImplementedMethod(**DTopics)]
-    # Corpus
-    source_corpus = [NameSpace('generated').adds(functions)]
-    # Add source
-    internalHandler.source_corpus(source_corpus)
+    HPP = [ Include(*get_internal_include(blueprint)),
+            Using('future::Internal'),
+            NameSpace('generated').add(CLASS)]
+
+
+    '''
+            Declaration Class Internal
+    '''
+
+    CPP = [NameSpace('generated').adds([ImplementedMethod(**Parameters),
+                                        ImplementedMethod(**Topics)])]
+
+
+
+    internalHandler.header_corpus(HPP)
+    internalHandler.source_corpus(CPP)
 
     return internalHandler

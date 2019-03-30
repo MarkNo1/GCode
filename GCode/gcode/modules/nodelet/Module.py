@@ -25,7 +25,7 @@
 
 from gcode.unit.base import Atom
 from gcode.generators.package import Package
-from gcode.generators.Cpp import CppHandler 
+from gcode.generators.Cpp import CppHandler
 from .Cpp import GetInterface, GetInternal, GetUser
 from gcode.primitive import path, exists
 
@@ -47,7 +47,7 @@ class INodelet(Package):
         pkg = path(self.root, self.package)
         if exists(pkg):
             self.LogWarn('Package already Exist')
-            self.LogWarn('Proceed ?')
+            # self.LogWarn('Proceed ?')
             # self._continue = input('\t\t\t\t\t[y, n] :  ')
             # self._continue = True if self._continue == 'y' else False
 

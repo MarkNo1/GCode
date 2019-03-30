@@ -1,1 +1,2 @@
-from .nodelet.Module import Nodelet
+from .nodelet import Nodelet
+from .InteractiveShell import GenShell

@@ -13,7 +13,6 @@
 #    and/or other materials provided with the distribution.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
 # ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
@@ -24,40 +23,53 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .base import Atom
 
-'''
-    LIST
-'''
+#!/usr/local/bin/python3.7
+# -*- coding: utf-8 -*-
+
+"""
+PyVision for the sexylib PyQt6
+last edited: March 2019
+"""
+
+import sys, traceback
+from PyQt5.QtWidgets import QApplication, QWidget
+from gcode import Dictionary
+from gcode import Logger
+
+# Default Windows features
+DefaultWindowsGeometry = Dictionary(x=300,y=300, h=360, w=420)
 
 
-class List(Atom):
-    def __init__(self, name='', data=[]):
-        super().__init__(name)
-        self.__init(data)
+# QT QApplication
+class Application(Logger):
+    def __init__(self, *args, **kwargs):
+        super().__init__('QT')
+        self.LogSucces('Start')
+        self.APP = QApplication(*args,**kwargs)
 
-    def __init(self, data):
-        if isinstance(data, list):
-            self.data = data
-        else:
-            self.data = [data]
+    # Destructor
+    def __del__(self):
+        try:
+            sys.exit(self.APP.exec_())
+        except BaseException:
+            self.Log('End')
 
-    def __call__(self):
-        for var in self.data:
-            yield var
 
-    def __len__(self):
-        return len(self.data)
+# QT Widgets Window
+def Window(geometry=DefaultWindowsGeometry):
+    w = QWidget()
+    w.resize(geometry.h, geometry.w)
+    w.move(geometry.x, geometry.y)
+    w.setWindowTitle('Simple')
+    return w
 
-    def __str__(self):
-        text = ''
-        for line in self.data:
-            text += f'{line} '
-        return text
 
-    def add(self, val):
-        self.data.append(val)
-        return self
 
-    def get_last(self):
-        return self.data[-1]
+if __name__ == '__main__':
+    from time import sleep
+    app = Application(sys.argv)
+    w = Window()
+    w.show()
+
+    sleep(10)

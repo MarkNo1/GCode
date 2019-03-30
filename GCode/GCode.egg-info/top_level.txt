@@ -1,0 +1,12 @@
+gcode
+gcode/blueprints
+gcode/generators
+gcode/generators/Cpp
+gcode/generators/Xml
+gcode/modules
+gcode/modules/nodelet
+gcode/modules/nodelet/Cpp
+gcode/primitive
+gcode/resources
+gcode/ui
+gcode/unit

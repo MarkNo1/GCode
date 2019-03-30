@@ -263,7 +263,7 @@ class ImplementedFucntion(CurlyBracketBlock):
 class ImplementedMethod(CurlyBracketBlock):
     def __init__(self, returntype:str='', classname:str='', name:str='', args:str='',
                  pre:str='', post:str='', body:list=[]):
-        method_name = f'{classname}::name'
+        method_name = f'{classname}::{name}'
         incipit = DeclareFunction(returntype,method_name,args,pre)
         super().__init__(incipit)
         self.adds(body)

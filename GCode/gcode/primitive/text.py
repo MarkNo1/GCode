@@ -25,4 +25,4 @@
 
 
 # Replace
-replace = lambda text, target, changer, count=None : text.replace(target, changer, count)
+replace = lambda text, target, changer, count = None : text.replace(target, changer, count)
